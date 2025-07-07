@@ -5,10 +5,6 @@ draft: false
 tags: ["homelab", "cybersecurity", "defense in depth", "secure by design", "castles", "moats"]
 ---
 
-You know, I applied to two different events to talk about this topic. One said no, the other never responded. So here we are, using the power of TLS and HTML to share it anyway.
-
-Not because I think I'm some kind of thought leader (heaven forbid), but because I believe this is something worth sharing; an understanding that took me a while to arrive at, and made cybersecurity *click*. And if it helped me, maybe it can help someone else.
-
 ---
 
 ## Preface
@@ -91,13 +87,13 @@ Obviously, this metaphor is not perfect. Siege tactics and castle building techn
 {{< /alert >}}
 
 ## Secure by Design: A Lesson in Architecture
-At a glance, a castle might just look like a big stone mansion. In some ways, that's true---they were expensive and extravagant dwellings. But, they were also feats of engineering designed to be imposing and intimidating fortresses. Every detail was considered with one goal: give the defender the advantage, at every stage of a siege. And all of this was planned *before the first stone was even laid*.
+At a glance, a castle might just look like a big stone mansion. And in some ways, that's absolutely true. They were expensive and extravagant dwellings. But, they were also feats of engineering designed to be imposing, intimidating, fortresses. Every detail was considered with the goal of giving the defender an advantage at every stage of a siege. And all of this was planned *before the first stone was even laid*.
 
 | Defense | Purpose |
 |----------------------|-----------------------|
 | Location & Elevation | Castles were often placed on hills, bluffs, or cliffs, and included towers for a reason: visibility was power. You saw the enemy coming long before they reached you, buying time to rally forces and prepare defenses. The elevation also made a rapid approach nearly impossible. |
 | Archery Loopholes | Built into nearly every wall, these narrow vertical slits gave archers wide fields of fire while minimizing exposure. Their angles and placements overlapped to eliminate blind spots and deny attackers safe zones. The wall wasn't just a barrier, it was a weapon. |
-| Moats | Whether filled with water or simply dry trenches, moats served two purposes: an obstacle to keep enemies away from the walls and prevent scaling and undermining (digging under the walls), and a filter that forced attackers to go where defenders wanted them: the front gate. |
+| Moats | Whether filled with water or simply dry trenches, moats served two purposes: an obstacle to keep enemies away from the walls, discouraging scaling and undermining (digging under the walls); and a filter that forced attackers to go where defenders wanted them: the front gate. |
 
 These defenses are only a few of the many features that were baked in from the start; not bolted on after the castle was built. This meant that a castle wasn't just secure because it was big or strong, it was secure because it was designed to be defensible down to the very last detail.
 
@@ -106,28 +102,30 @@ This is the heart of **Secure by Design**.
 ## Defense in Depth: Executing Architectural Strategy
 Simply building a castle with defensibility features didn't make it inherently secure. Castles got their reputation from how these features were used in conjunction with one another to control an attack.
 
-A good castle doesn't just try to repel enemies — it drains them. Of energy. Of time. Of morale. Multiple, coordinated layers of protection worked together to slow, trap, and weaken an attacker at every step.
+A good castle didn't just repel enemies, it drained them. Of energy. Of time. Of morale. Multiple, coordinated layers of protection worked together to slow, trap, and weaken an attacker at every step.
 
 | Defense | Purpose |
 |----------------------|-----------------------|
-| Main Gate | Moats forced attackers here, where defenders were ready to meet them. Archer fire intensified outside the gate, forcing attackers to rush in for shelter; right into the castle's trap. The gate wasn't just an opening... it was a kill zone. Arrows from the sides, rocks and boiling oil from above. |
-| Courtyard | Breaching the gate was no small feat, but the fight wasn't necessarily over just because attackers made it in. In the courtyard, intruders were funneled into tight quarters under constant pressure, giving defenders time to regroup and pick them off from inner walls and towers in addition to the outer walls and towers. |
-| Spiral Staircases | For those who managed to survive this far and made it into the castle proper, you were met with the final insult: narrow, clockwise-ascending staircases. Right-handed attackers had to swing toward the central column making close combat awkward and difficult. Meanwhile, defenders fighting downhill had reach, mobility, and gravity on their side. |
+| Main Gate | Moats forced attackers here, where defenders were ready to meet them. Archer fire intensified outside the gate, enticing attackers to rush in for shelter; right into the castle's trap. The gate wasn't just an opening... it was a kill zone. Arrows from the sides, rocks and boiling oil from above. |
+| Courtyard | Breaching the gate was no small feat, but the fight wasn't necessarily over just because attackers made it in. In the courtyard, intruders were funneled into tight quarters under constant pressure, giving defenders opportunity to pick them off from every angle. |
+| Spiral Staircases | Those who managed to survive this far and made it into the castle proper were met with the final insult: narrow, clockwise-ascending staircases. Right-handed attackers had to swing toward the central column making close combat awkward and difficult. Meanwhile, defenders fighting downhill had reach, mobility, and gravity on their side. |
 
-Each layer didn't need to stop the attacker on its own; if the enemy was able to overwhelm it then they were handed off to the next layer. Slower, weaker, and more exposed than before.
+No single defensive layer needed to stop the attacker on its own. If the enemy was able to overwhelm one, the next layer was ready to take over. And while the enemy may have been making progress, they met each layer of defense slower, weaker, and more exposed than before.
 
-That's **Defense in Depth**: a system doesn't need to be perfect, it just needs to be resilient. Every layer assumes the last one might fail and is ready when it does.
+That's **Defense in Depth**. No single system needs to be perfect, they just need to work together. Every layer assumes the last one might fail and is ready when it does.
 
 ## Takeaways
 Alright, we get it, castles are cool. So what?
 
-As I mentioned earlier, this metaphor doesn't perfectly parallel the modern cybersecurity landscape. Most breaches today don't happen at the front gate, they happen when someone unknowingly opens the back door and lets the enemy walk right in---it's called phishing. The perimeter gets skipped entirely.
+As I mentioned earlier, this metaphor doesn't perfectly parallel the modern cybersecurity landscape. Most breaches today don't happen at the front gate, they happen when someone unknowingly opens the back door and lets the enemy walk right in---it's called phishing, and the perimeter gets skipped entirely.
+
+![Image of a Trojan Horse](trojan-horse-drawing.png)
 
 In medieval times, if a castle's outer wall fell, the battle was usually over. Quickly and brutally. Even though castles had multiple defensive layers, their strategy relied heavily on redirecting attackers into traps using walls and moats, and they were constrained by physical architecture. After all, they had to build the entire thing out of stone.
 
-Today, things are different. Perimeters get breached all the time. If that's your only line of defense, you're hosed. But the digital world gives us options the physical world can only dream of. A breached perimeter doesn't have to mean the fight is over... we can reconfigure, expand, and reinforce defenses in seconds without worrying as much about building materials or physical space.
+Today, things are different. Perimeters get breached all the time. If that's your only line of defense, you're hosed. But the digital world gives us options the physical world can only dream of. A breached perimeter doesn't have to mean the fight is over... we can reconfigure, expand, and reinforce defenses in seconds without needing to worry about building materials or physical space.
 
-During or after an attack isn't the time to start thinking about defense though, and that's why the castle metaphor still matters: it demonstrates the power of layering defenses and the importance of building them in from the start. And if we were to emulate a castle's approach to layered defense, it might look something like this:
+During or after an attack isn't the time to start thinking about defense though, and that's why the castle metaphor still matters. It demonstrates the power of layering defenses, but more importantly, it shows the benefits of building them in from the start. If we were to emulate a castle's approach to layered defense in a network, it might look something like this:
 
 | Castle Defense | Purpose | Modern Parallel |
 |----------------|---------|-----------------|
