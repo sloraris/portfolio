@@ -1,0 +1,29 @@
+disabled = false
+languageCode = "en"
+languageName = "English"
+weight = 1
+title = "sloraris"
+
+[params]
+  displayName = "EN"
+  isoCode = "en"
+  rtl = false
+  dateFormat = "2 January 2006"
+  logo = "img/[sloraris]-dark-mode.svg"
+  secondaryLogo = "img/[sloraris]-light-mode.svg"
+  description = "My unsolicited ideas and experiences — in HTML. A portfolio of sorts."
+  # copyright = "© { year } sloraris"
+
+[params.author]
+  name = "sloraris"
+  email = "sloraris@sloraris.dev"
+  image = "img/slo-pfp-expanded.jpeg"
+  imageQuality = 96
+  headline = "IS and Cybersecurity Professional"
+  bio = "I’m sloraris, an IT and Cybersecurity professional with a degree in Information Systems. I build and manage infrastructure that’s clean, automated, and secure. I’m driven by curiosity, ruthless practicality, neverending passion for all things tech, and a love of breaking things just to rebuild them better."
+  links = [
+    { email = "mailto:sloraris@sloraris.dev" },
+    { discord = "https://discordapp.com/users/858914004935639081" },
+    { github = "https://github.com/sloraris" },
+    { linkedin = "https://linkedin.com/in/parker-owings" },
+  ]

@@ -1,0 +1,12 @@
+/public/
+/resources/_gen/
+/hugo_stats.json
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+Network Trash Folder
+Temporary Items
+.apdisk
+*/node_modules
