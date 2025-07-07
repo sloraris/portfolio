@@ -40,7 +40,7 @@ So when people talked about “SSL” or “OIDC,” I nodded — those were goo
 ...I'm sure you can guess where this is going.
 
 ## An Important History Lesson
-![Image of Castle and Moat](https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/b510ef0d-1f06-4084-be0c-1c9612777959/dfudqtw-f80645b8-02de-4ea3-903b-fa1848d79f90.jpg/v1/fill/w_1177,h_679,q_70,strp/fantasy_castle_with_moat_and_mountains_2_0_by_prinzsunny_dfudqtw-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9Mzg0MCIsInBhdGgiOiJcL2ZcL2I1MTBlZjBkLTFmMDYtNDA4NC1iZTBjLTFjOTYxMjc3Nzk1OVwvZGZ1ZHF0dy1mODA2NDViOC0wMmRlLTRlYTMtOTAzYi1mYTE4NDhkNzlmOTAuanBnIiwid2lkdGgiOiI8PTY2NTYifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.p4ILgc8XVSIYrxfq_6zcSz7GncMxESk4DH-uBlPv904)
+![Image of Castle Drawings](drawing-castles-medieval-buildings-old-gothic-towers-ancient-constructions-recent-vector-castles-collection_80590-16827-3507027916.jpg)
 In a *shocking* turn of events, I wound up in Utah State University's *Information Systems - Cybersecurity* program. It was the closest degree I could find to the homelab stuff I enjoyed, so I decided I'd put up with the security classes that---at the time---I didn't much care for.
 
 {{% lead %}}
