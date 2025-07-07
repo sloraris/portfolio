@@ -78,7 +78,7 @@ This *revelation* made two things abundantly clear to me:
 
 All of a sudden, the basic perimeter-based "castle and moat" design I'd learned felt wholly inadequate. This new design, on the other hand, made a lot of sense. Once inside, the entire architecture was a layered nightmare for intruders. Attackers were at a disadvantage everywhere they went.
 
-This was a strong metaphor, and Scott used it to deliver---in my opinion---two of the most important security principles I've yet to learn:
+This was a strong metaphor, and Scott used it to deliver---in my opinion---two of the most important security principles I've learned so far:
 1.	**Secure by Design** – Design your systems to favor the defender from the start
 2.	**Defense in Depth** – One layer of defense isn't enough, and your layers need to work together
 
