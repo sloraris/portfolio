@@ -1,8 +1,8 @@
 ---
 title: "Defense in Depth: Castles and Moats"
-date: 2025-06-29
-draft: true
-tags: ["homelab", "cybersecurity", "defense in depth", "castles", "moats"]
+date: 2025-07-06
+draft: false
+tags: ["homelab", "cybersecurity", "defense in depth", "secure by design", "castles", "moats"]
 ---
 
 You know, I applied to two different events to talk about this topic. One said no, the other never responded. So here we are, using the power of TLS and HTML to share it anyways.
