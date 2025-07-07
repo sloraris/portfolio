@@ -5,9 +5,9 @@ draft: false
 tags: ["homelab", "cybersecurity", "defense in depth", "secure by design", "castles", "moats"]
 ---
 
-You know, I applied to two different events to talk about this topic. One said no, the other never responded. So here we are, using the power of TLS and HTML to share it anyways.
+You know, I applied to two different events to talk about this topic. One said no, the other never responded. So here we are, using the power of TLS and HTML to share it anyway.
 
-Not because I think I’m some kind of thought leader (heaven forbid), but because I believe this is something worth sharing; an understanding that took me a while to arrive at, and made cybersecurity *click*. And if it helped me, maybe it can help someone else.
+Not because I think I'm some kind of thought leader (heaven forbid), but because I believe this is something worth sharing; an understanding that took me a while to arrive at, and made cybersecurity *click*. And if it helped me, maybe it can help someone else.
 
 ---
 
@@ -21,21 +21,21 @@ When I first entered the *real* tech space, you know, like beyond knowing how to
 For many, this is where it all starts. Sure, there are lots of online servers to play, but why join those when you can run your own? Download the server binary, set it up on an old laptop or something, a quick port forward and you're good to go.
 
 For me, this was the beginning of a very rapid entrance into the world of computers:
-- First I wanted to run the servers on a machine other than my PC, which meant learning Linux.
-- Then I wanted to run linux on a machine that didn't need a monitor, which meant learning SSH and the terminal.
-- Then I wanted a UI to manage all my servers, which introduced me to the LAMP stack via [MultiCraft](https://www.multicraft.org).
-- Then I wanted to run more than just linux on my server hardware and eliminate the need to install a bunch of dependencies, so I learned about Docker and VMs.
+- First I wanted to run the Minecraft servers on a machine other than my PC, which meant learning Linux.
+- Then I wanted to run Linux on a machine that didn't need a monitor, which meant learning SSH and the terminal.
+- Then I wanted a UI to manage all my Minecraft servers, which introduced me to the LAMP stack via [MultiCraft](https://www.multicraft.org).
+- Then I wanted to run more than just Linux on my server hardware and eliminate the need to install a bunch of dependencies, so I learned about Docker and VMs.
 
-Each step in the journey was a natural part of the progression, but I very quickly surpassed *just* running minecraft servers. That wasn't enough for me.Now, I wanted to *understand* every piece of the stack involved. Hardware, software, kernel, web pages, you name it and I probably had a long conversation with ChatGPT 3.0 about it, followed by hours of youtube tutorials.
+Each step in the journey was a natural part of the progression, but I very quickly surpassed *just* running Minecraft servers. That wasn't enough for me. Now, I wanted to *understand* every piece of the stack involved. Hardware, software, kernel, web pages, you name it and I probably had a long conversation with ChatGPT 3.0 about it, followed by hours of YouTube tutorials.
 
 Naturally, with server hosting and external access on my mind, networking equipment came onto my radar, and thus began my foray into the land of homelabbing.
 
 ## Building My First Digital Castle
 Once I officially dove into homelabbing, there was one piece of gear I absolutely loved: **my router**.
 
-Initially an old Mac Mini running pfSense, then a Protectli Vault running OPNSense, then a full rack-mounted Unifi stack, my joy from watching my router's firewall do it's thing was immense. It was sleek. It was powerful. It shielded me and my precious minecraft servers from the wild-west of the internet just outside my LAN. Rules, blocks, filters, port forwarding, tagging, NAT, DNS, DHCP... I spent hours fine-tuning settings and creating VLANs. Why? Because subnetting was cool, and because the internet said that was the "right way to do things." I had this vivid mental image: all my important stuff was inside the firewall, and the Bad Guys™ were stuck outside. Easy castle and moat philosophy.
+Initially an old Mac Mini running pfSense, then a Protectli Vault running OPNSense, then a full rack-mounted Unifi stack, my joy from watching my router's firewall do its thing was immense. It was sleek. It was powerful. It shielded me and my precious Minecraft servers from the wild-west of the internet just outside my LAN. Rules, blocks, filters, port forwarding, tagging, NAT, DNS, DHCP... I spent hours fine-tuning settings and creating VLANs. Why? Because subnetting was cool, and because the internet said that was the "right way to do things." I had this vivid mental image: all my important stuff was inside the firewall, and the Bad Guys™ were stuck outside. Easy castle and moat philosophy.
 
-So when people talked about “SSL” or “OIDC,” I nodded — those were good tools for situations outside my LAN; for other services. Inside my LAN, my firewall was the the only shield I needed. Everything else? Nice-to-have. Maybe I'd put it on my todo list and check it out someday when I was bored. My network was the main thing I was interested in.
+So when people talked about "SSL" or "OIDC," I nodded — those were good tools for situations outside my LAN; for other services. Inside my LAN, my firewall was the only shield I needed. Everything else? Nice-to-have. Maybe I'd put it on my todo list and check it out someday when I was bored. My network was the main thing I was interested in.
 
 ...I'm sure you can guess where this is going.
 
@@ -49,7 +49,7 @@ In a *shocking* turn of events, I wound up in Utah State University's *Informati
 
 Enter [Scott Roberts](https://sroberts.io), one of my cybersecurity professors. This guy had one of the coolest work histories of anyone I'd ever met, and lots of experience to accompany it. If nothing else, his cybersecurity classes were eye-opening, entertaining, and topped with a little intrigue.
 
-For one of our assignments, Scott had us do a report on a book of our choosing that told a cybersecurity story. I read [*Sandworm*](https://www.goodreads.com/book/show/41436213-sandworm) by Frank Herbert, which talks about [NotPetya](https://en.wikipedia.org/wiki/NotPetya) and it's impact on the world (primarily Ukraine). If you aren't familiar with the story, I *highly* recommend checking it out. Before reading *Sandworm*, I was lukewarm on cybersecurity primarily because I didn't grasp how much of an impact a cyber event could have. Afterwards? Let me tell you, the events in that book opened my eyes to the importance of cybersecurity and gave me a real appreciation for it. Everything in our lives now is network connected and therefore hackable... there is a massive amount of gravity behind the need for good cybersecurity.
+For one of our assignments, Scott had us do a report on a book of our choosing that told a cybersecurity story. I read [*Sandworm*](https://www.goodreads.com/book/show/41436213-sandworm) by Frank Herbert, which talks about [NotPetya](https://en.wikipedia.org/wiki/NotPetya) and its impact on the world (primarily Ukraine). If you aren't familiar with the story, I *highly* recommend checking it out. Before reading *Sandworm*, I was lukewarm on cybersecurity primarily because I didn't grasp how much of an impact a cyber event could have. Afterwards? Let me tell you, the events in that book opened my eyes to the importance of cybersecurity and gave me a real appreciation for it. Everything in our lives now is network connected and therefore hackable... there is a massive amount of gravity behind the need for good cybersecurity.
 
 My personal interest and feeling of urgency towards the subject overall though was, admittedly, still dull as ever.
 
@@ -57,7 +57,7 @@ My personal interest and feeling of urgency towards the subject overall though w
 An important and cool job, *still for **somebody else***.
 {{% /lead %}}
 
-I grew to really value Scott's experience and his input on homelab related things, especially the networking aspect, even if it were almost always from a security standpoint. Fast forward to my final semester, I'm in my last class of his, and we're learning about how to do cybersecurity from a business standpoint. Again, it made sense, but I still just wanted the technical side of things... hardware and software and networking, miss me with the business and threat stuff. Want me to flex my Docker knowledge and spin up containers? Done. We're talking about network security? Cool, let me pull up my VLAN layout to demonstrate I have a firm grasp on the topic.
+I grew to really value Scott's experience and his input on homelab-related things, especially the networking aspect, even if it were almost always from a security standpoint. Fast forward to my final semester, I'm in my last class of his, and we're learning about how to do cybersecurity from a business standpoint. Again, it made sense, but I still just wanted the technical side of things... hardware and software and networking, miss me with the business and threat stuff. Want me to flex my Docker knowledge and spin up containers? Done. We're talking about network security? Cool, let me pull up my VLAN layout to demonstrate I have a firm grasp on the topic.
 
 I wouldn't call myself cocky, but I genuinely thought I was well ahead of the curve and could safely leave the broader security stuff to someone else. That is, until Scott dropped a metaphor that revealed my naivety...
 
@@ -80,54 +80,54 @@ This *revelation* made two things abundantly clear to me:
 1. I didn't watch enough History Channel growing up
 2. Cybersecurity wasn't just about maintaining the perimeter, it was about having options when the perimeter was breached
 
-All of a sudden, the basic perimeter-based "castle and moat" design I'd learned felt wholly inadequate. This new design on the other hand, made a lot of sense. Once inside, the entire architecture was a layered nightmare for intruders. Attackers were at a disadvantage everywhere they went.
+All of a sudden, the basic perimeter-based "castle and moat" design I'd learned felt wholly inadequate. This new design, on the other hand, made a lot of sense. Once inside, the entire architecture was a layered nightmare for intruders. Attackers were at a disadvantage everywhere they went.
 
 This was a strong metaphor, and Scott used it to deliver---in my opinion---two of the most important security principles I've yet to learn:
 1.	**Secure by Design** – Design your systems to favor the defender from the start
 2.	**Defense in Depth** – One layer of defense isn't enough, and your layers need to work together
 
 {{< alert icon="circle-info" >}}
-Obviously, this metaphor is not perfect. Siege tactics and castle building techniques do not perfectly translate to the Cybersecurity landscape, but the cyclical nature of attacks evolving and defenses being developed to keep pace, remains the same.
+Obviously, this metaphor is not perfect. Siege tactics and castle building techniques do not perfectly translate to the cybersecurity landscape, but the cyclical nature of attacks evolving and defenses being developed to keep pace remains the same.
 {{< /alert >}}
 
 ## Secure by Design: A Lesson in Architecture
-At a glance, a castle might just look like a big stone mansion. In some ways, that’s true---they were expensive and extravagant dwellings. But, they were also feats of engineering designed to be imposing and intimidating fortresses. Every detail was considered with one goal: give the defender the advantage, at every stage of a siege. And all of this was planned *before the first stone was even laid*.
+At a glance, a castle might just look like a big stone mansion. In some ways, that's true---they were expensive and extravagant dwellings. But, they were also feats of engineering designed to be imposing and intimidating fortresses. Every detail was considered with one goal: give the defender the advantage, at every stage of a siege. And all of this was planned *before the first stone was even laid*.
 
 | Defense | Purpose |
 |----------------------|-----------------------|
 | Location & Elevation | Castles were often placed on hills, bluffs, or cliffs, and included towers for a reason: visibility was power. You saw the enemy coming long before they reached you, buying time to rally forces and prepare defenses. The elevation also made a rapid approach nearly impossible. |
-| Archery Loopholes | Built into nearly every wall, these narrow vertical slits gave archers wide fields of fire while minimizing exposure. Their angles and placements overlapped to eliminate blind spots and deny attackers safe zones. The wall wasn’t just a barrier, it was a weapon. |
+| Archery Loopholes | Built into nearly every wall, these narrow vertical slits gave archers wide fields of fire while minimizing exposure. Their angles and placements overlapped to eliminate blind spots and deny attackers safe zones. The wall wasn't just a barrier, it was a weapon. |
 | Moats | Whether filled with water or simply dry trenches, moats served two purposes: an obstacle to keep enemies away from the walls and prevent scaling and undermining (digging under the walls), and a filter that forced attackers to go where defenders wanted them: the front gate. |
 
-These defenses are only a few of the many features that were baked in from the start; not bolted on after the castle was built. This meant that a castle wasn’t just secure because it was big or strong, it was secure because it was designed to be defensible down to the very last detail.
+These defenses are only a few of the many features that were baked in from the start; not bolted on after the castle was built. This meant that a castle wasn't just secure because it was big or strong, it was secure because it was designed to be defensible down to the very last detail.
 
 This is the heart of **Secure by Design**.
 
 ## Defense in Depth: Executing Architectural Strategy
 Simply building a castle with defensibility features didn't make it inherently secure. Castles got their reputation from how these features were used in conjunction with one another to control an attack.
 
-A good castle doesn’t just try to repel enemies — it drains them. Of energy. Of time. Of morale. Multiple, coordinated layers of protection worked together to slow, trap, and weaken an attacker at every step.
+A good castle doesn't just try to repel enemies — it drains them. Of energy. Of time. Of morale. Multiple, coordinated layers of protection worked together to slow, trap, and weaken an attacker at every step.
 
 | Defense | Purpose |
 |----------------------|-----------------------|
-| Main Gate | Moats forced attackers here, where defenders were ready to meet them. Archer fire intensified outside the gate, forcing attackers to rush in for shelter; right into the castle’s trap. The gate wasn’t just an opening... it was a kill zone. Arrows from the sides, rocks and boiling oil from above. |
+| Main Gate | Moats forced attackers here, where defenders were ready to meet them. Archer fire intensified outside the gate, forcing attackers to rush in for shelter; right into the castle's trap. The gate wasn't just an opening... it was a kill zone. Arrows from the sides, rocks and boiling oil from above. |
 | Courtyard | Breaching the gate was no small feat, but the fight wasn't necessarily over just because attackers made it in. In the courtyard, intruders were funneled into tight quarters under constant pressure, giving defenders time to regroup and pick them off from inner walls and towers in addition to the outer walls and towers. |
 | Spiral Staircases | For those who managed to survive this far and made it into the castle proper, you were met with the final insult: narrow, clockwise-ascending staircases. Right-handed attackers had to swing toward the central column making close combat awkward and difficult. Meanwhile, defenders fighting downhill had reach, mobility, and gravity on their side. |
 
-Each layer didn’t need to stop the attacker on it's own, if the enemy was able to overwhelm it then they were handed them off to the next layer. Slower, weaker, and more exposed than before.
+Each layer didn't need to stop the attacker on its own; if the enemy was able to overwhelm it then they were handed off to the next layer. Slower, weaker, and more exposed than before.
 
-That’s **Defense in Depth**: a system doesn't need to be perfect, it just needs to be resilient. Every layer assumes the last one might fail and is ready when it does.
+That's **Defense in Depth**: a system doesn't need to be perfect, it just needs to be resilient. Every layer assumes the last one might fail and is ready when it does.
 
 ## Takeaways
 Alright, we get it, castles are cool. So what?
 
-As I mentioned earlier, this metaphor doesn’t perfectly parallel the modern cybersecurity landscape. Most breaches today don’t happen at the front gate, they happen when someone unknowingly opens the back door and lets the enemy walk right in---it's called phishing. The perimeter gets skipped entirely.
+As I mentioned earlier, this metaphor doesn't perfectly parallel the modern cybersecurity landscape. Most breaches today don't happen at the front gate, they happen when someone unknowingly opens the back door and lets the enemy walk right in---it's called phishing. The perimeter gets skipped entirely.
 
-In medieval times, if a castle’s outer wall fell, the battle was usually over. Quickly and brutally. Even though castles had multiple defensive layers, their strategy relied heavily on redirecting attackers into traps using walls and moats, and they were constrained by physical architecture. After all, they had to build the entire thing out of stone.
+In medieval times, if a castle's outer wall fell, the battle was usually over. Quickly and brutally. Even though castles had multiple defensive layers, their strategy relied heavily on redirecting attackers into traps using walls and moats, and they were constrained by physical architecture. After all, they had to build the entire thing out of stone.
 
-Today, things are different. Perimeters get breached all the time. If that’s your only line of defense, you’re hosed. But the digital world gives us options the physical world can only dream of. A breached perimeter doesn’t have to mean the fight is over... we can reconfigure, expand, and reinforce defenses in seconds without worrying as much about building materials or physical space.
+Today, things are different. Perimeters get breached all the time. If that's your only line of defense, you're hosed. But the digital world gives us options the physical world can only dream of. A breached perimeter doesn't have to mean the fight is over... we can reconfigure, expand, and reinforce defenses in seconds without worrying as much about building materials or physical space.
 
-During or after an attack isn't the time to start thinking about defense though, and that’s why the castle metaphor still matters: it demonstrates the power of layering defenses and the importance of building them in from the start. And if we were to emulate a castle’s approach to layered defense, it might look something like this:
+During or after an attack isn't the time to start thinking about defense though, and that's why the castle metaphor still matters: it demonstrates the power of layering defenses and the importance of building them in from the start. And if we were to emulate a castle's approach to layered defense, it might look something like this:
 
 | Castle Defense | Purpose | Modern Parallel |
 |----------------|---------|-----------------|
@@ -140,24 +140,24 @@ During or after an attack isn't the time to start thinking about defense though,
 
 This is by no means a comprehensive list, but it's a good starting point.
 
-That class lecture didn’t just teach me a fun historical fact, it rewired the way I *understand* cybersecurity.
+That class lecture didn't just teach me a fun historical fact, it rewired the way I *understand* cybersecurity.
 
 I knew passwords mattered. I knew you should patch stuff. But I thought security was perimeter-based, with everything else for the paranoid or high-stakes operations.
 
-But it’s not. The perimeter matters, sure.
+But it's not. The perimeter matters, sure.
 
 But at the end of the day?
 
 {{% lead %}}
-*It’s not the moat doing the defending, **it’s the castle***.
+*It's not the moat doing the defending, **it's the castle***.
 {{% /lead %}}
 
-If your internal systems are soft, flat, and unaudited, it doesn’t matter how strong your firewall is. The moat might slow someone down, but once they’re across, if your architecture isn’t built for defense, you’ve lost.
+If your internal systems are soft, flat, and unaudited, it doesn't matter how strong your firewall is. The moat might slow someone down, but once they're across, if your architecture isn't built for defense, you've lost.
 
 ## Final Thoughts
 To many, this is old news. But for anyone learning cybersecurity, IT, or operations, this metaphor still matters. Security is strongest when it's designed into every aspect of a system and planned from the start, not just slapped on afterwards.
 
-And maybe, if you’ve been treating your firewall like a moat and thinking that’s enough, hopefully this has given you something to think about!
+And maybe, if you've been treating your firewall like a moat and thinking that's enough, hopefully this has given you something to think about!
 
 Because if your security stops at the moat, that's not much of a castle... and you could probably learn some lessons from the Empire. That's all I'm saying.
 
