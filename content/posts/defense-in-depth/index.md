@@ -155,7 +155,7 @@ But at the end of the day?
 If your internal systems are soft, flat, and unaudited, it doesn’t matter how strong your firewall is. The moat might slow someone down, but once they’re across, if your architecture isn’t built for defense, you’ve lost.
 
 ## Final Thoughts
-To many, this is old news. But for anyone learning cybersecurity, IT or operations, this metaphor still matters. Security is strongest when it's designed into every aspect of a system and planned from the start, not just slapped on afterwards.
+To many, this is old news. But for anyone learning cybersecurity, IT, or operations, this metaphor still matters. Security is strongest when it's designed into every aspect of a system and planned from the start, not just slapped on afterwards.
 
 And maybe, if you’ve been treating your firewall like a moat and thinking that’s enough, hopefully this has given you something to think about!
 
