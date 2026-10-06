@@ -21,9 +21,11 @@
   prefersdark: true;
   color-scheme: dark;
 
-  --color-base-100: #161a36;
-  --color-base-200: #0d1026;
-  --color-base-300: #070a1a;
+  /* deep space: the page is near-black with only a trace of blue; panels and cards are a step or two above it and
+     get a soft shadow + violet rim (see .post-card, .rail-card) so they read as floating in it */
+  --color-base-100: #0e1230;
+  --color-base-200: #070a1b;
+  --color-base-300: #02030b;
   --color-base-content: #e6e9f7;
 
   --color-primary: #7c3aed;
@@ -33,7 +35,7 @@
   --color-accent: #fc8236;
   --color-accent-content: #1a0d03;
   --color-neutral: #e6e9f7;
-  --color-neutral-content: #0d1026;
+  --color-neutral-content: #070a1b;
 
   --color-info: #9ca3af;
   --color-info-content: #111827;
@@ -74,7 +76,20 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 6rem;
+  background: var(--color-base-300); /* the layout itself is transparent so the star layer behind it shows */
 }
+
+/* Faint static stars behind everything, fixed to the window. Cards, panels and the home hero are opaque and cover them. */
+.page-stars {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.page-stars > i { position: absolute; top: 0; left: 0; width: 1px; height: 1px; border-radius: 50%; }
+.page-stars > i.mid { width: 1.5px; height: 1.5px; }
+.page-stars > i.big { width: 2px; height: 2px; }
 
 h1, h2, h3, h4, h5, h6, a, .btn {
   font-family: var(--font-display);
@@ -122,18 +137,10 @@ hr.slo-hr {
 .post-card {
   position: relative;
   overflow: hidden;
-  border: 1px solid color-mix(in oklab, var(--color-glow) 14%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-glow) 16%, transparent);
+  /* just a hint of lift: a soft dark shadow below and the faintest violet halo */
+  box-shadow: 0 10px 26px -16px rgb(0 0 0 / 0.6), 0 0 22px -12px color-mix(in oklab, var(--color-glow) 12%, transparent);
   transition: ease-in-out 0.2s;
-}
-/* a thin strip of the site gradient along the top edge */
-.post-card::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 3px;
-  background: var(--grad-space);
-  z-index: 1;
-  pointer-events: none;
 }
 /* hover: the card lights up violet (it used to flip to a light card) */
 .post-card:hover {
@@ -564,21 +571,30 @@ hr.slo-hr {
 }
 
 /*------------------- Social links: hover -------------------*/
-/* Each icon lights up in its own colour on hover: GitHub soft violet, LinkedIn cyan, RSS orange. */
+/* No outline, no background: on hover the logo itself glows in its own colour. GitHub white, LinkedIn blue, email the
+   site violet, RSS orange (the feed icon's traditional colour, here the site's orange). */
 .social-link {
   --c: var(--color-base-content);
-  transition: scale 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease, background-color 0.2s ease, box-shadow 0.25s ease;
+  transition: scale 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
 }
-.social-link--github { --c: var(--color-soft); }
-.social-link--linkedin { --c: var(--color-secondary); }
+.social-link svg { transition: filter 0.25s ease; }
+.social-link--github { --c: #ffffff; }
+.social-link--linkedin { --c: #3b8eea; } /* LinkedIn blue, lifted a little so it reads on the dark nav */
+.social-link--email { --c: var(--color-glow); }
 .social-link--rss { --c: var(--color-accent); }
 .social-link:hover,
 .social-link:focus-visible {
   color: var(--c);
-  background-color: color-mix(in oklab, var(--c) 16%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in oklab, var(--c) 40%, transparent), 0 0 14px color-mix(in oklab, var(--c) 32%, transparent);
+  background-color: transparent;
+  box-shadow: none;
   scale: 1.14; /* grows around its own centre, so it stays put in the pill */
 }
+.social-link:hover svg,
+.social-link:focus-visible svg {
+  filter: drop-shadow(0 0 3px var(--c)) drop-shadow(0 0 9px color-mix(in oklab, var(--c) 80%, transparent));
+}
+/* the keyboard keeps a plain focus ring; the mouse never sees it */
+.social-link:focus:not(:focus-visible) { outline: none; }
 .social-link:active { scale: 0.94; transition-duration: 0.1s; }
 @media (prefers-reduced-motion: reduce) {
   .social-link:hover, .social-link:focus-visible { scale: none; }
@@ -602,18 +618,19 @@ hr.slo-hr {
 
 /*------------------- Post content -------------------*/
 .post-prose {
-  --tw-prose-body: var(--color-base-content);
+  /* brightness hierarchy: body text a notch dimmer (~13:1 on the page), headings and bold at full white */
+  --tw-prose-body: #c8cde6;
   --tw-prose-headings: #fff;
-  --tw-prose-lead: var(--color-base-content);
+  --tw-prose-lead: #c8cde6;
   --tw-prose-links: var(--link-rest);
   --tw-prose-bold: #fff;
   --tw-prose-counters: var(--color-soft);
   --tw-prose-bullets: var(--color-soft);
   --tw-prose-hr: color-mix(in oklab, var(--color-base-content) 20%, transparent);
-  --tw-prose-quotes: var(--color-base-content);
+  --tw-prose-quotes: #dfe3f5;
   --tw-prose-quote-borders: var(--color-glow);
   --tw-prose-captions: var(--color-info);
-  --tw-prose-code: var(--color-base-content);
+  --tw-prose-code: #7dd3fc;
   --tw-prose-pre-code: inherit;
   --tw-prose-pre-bg: var(--color-base-200);
   --tw-prose-th-borders: color-mix(in oklab, var(--color-base-content) 30%, transparent);
@@ -623,9 +640,65 @@ hr.slo-hr {
 .post-prose h1, .post-prose h2, .post-prose h3, .post-prose h4 {
   font-family: var(--font-display);
 }
-/* Links rest in soft peach with an orange underline, so a link-heavy paragraph stays calm. Hover / pressed turn
-   the text full orange, thicken the underline and put a faint tint behind it. The underline must stay: peach is
-   too close to the body text colour to be told apart without it. Order matters: visited, then hover, then active. */
+
+/* Headings: h2 starts with a gradient ">" (the same prompt as on the home hero), h3 is soft violet. */
+.post-prose h2::before {
+  content: ">";
+  display: inline-block;
+  margin-right: 0.4em;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  background: var(--grad-space);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.post-prose h2 { margin-top: 3rem; }
+.post-prose h3 { color: var(--color-soft); }
+
+/* A little colour inside paragraphs: italics soft violet (but inherit inside links, headings and callout titles),
+   bold stays white, list markers violet. */
+.post-prose em { color: var(--color-soft); }
+.post-prose a em, .post-prose h2 em, .post-prose h3 em, .post-prose h4 em, .post-prose .callout-title em { color: inherit; }
+.post-prose ul > li::marker { color: var(--color-glow); content: "\25C6\00a0\00a0"; font-size: 0.7em; }
+.post-prose ol > li::marker { color: var(--color-soft); font-weight: 600; }
+
+/* A scene break (---): three small stars instead of a line. */
+.post-prose hr {
+  border: 0;
+  height: 1.5rem;
+  margin: 3rem 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='16' viewBox='0 0 96 16'%3E%3Cg fill='%23b79cff' fill-opacity='.75'%3E%3Cpath id='s' d='M16 1c.7 4.8 2.2 6.3 7 7-4.8.7-6.3 2.2-7 7-.7-4.8-2.2-6.3-7-7 4.8-.7 6.3-2.2 7-7z'/%3E%3Cpath d='M48 1c.7 4.8 2.2 6.3 7 7-4.8.7-6.3 2.2-7 7-.7-4.8-2.2-6.3-7-7 4.8-.7 6.3-2.2 7-7z'/%3E%3Cpath d='M80 1c.7 4.8 2.2 6.3 7 7-4.8.7-6.3 2.2-7 7-.7-4.8-2.2-6.3-7-7 4.8-.7 6.3-2.2 7-7z'/%3E%3C/g%3E%3C/svg%3E") no-repeat center / 96px 16px;
+}
+
+/* "#" after a heading: shows on hover / keyboard focus and copies the link to that section (src/lib/headingAnchors.js). */
+.post-prose a.heading-anchor,
+.post-prose a.heading-anchor:visited {
+  margin-left: 0.35em;
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  font-weight: 400;
+  color: var(--color-soft);
+  text-decoration: none;
+  background: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.post-prose :is(h2, h3, h4):hover > a.heading-anchor,
+.post-prose a.heading-anchor:focus-visible { opacity: 0.8; }
+.post-prose a.heading-anchor:hover,
+.post-prose a.heading-anchor:active { opacity: 1; color: var(--color-secondary); text-decoration: none; background: none; }
+.post-prose a.heading-anchor[data-copied]::after {
+  content: " copied";
+  font-size: 0.85em;
+  color: var(--color-success);
+}
+@media (hover: none) {
+  .post-prose a.heading-anchor { opacity: 0.4; } /* no hover on touch screens: keep it, dimly */
+}
+/* Links are orange, so they draw the eye. Hover lightens the text, thickens the underline and puts a faint tint behind
+   it; pressed flashes paler still. Links you have already opened turn soft peach (the underline stays orange, dimmer).
+   Order matters: visited, then hover, then active. */
 .post-prose a {
   text-decoration-line: underline;
   text-decoration-color: var(--color-accent);
@@ -636,11 +709,11 @@ hr.slo-hr {
 }
 .post-prose a:visited {
   color: var(--link-visited);
-  text-decoration-color: color-mix(in oklab, var(--color-accent) 40%, var(--color-base-300));
+  text-decoration-color: color-mix(in oklab, var(--color-accent) 55%, var(--color-base-300));
 }
 .post-prose a:hover {
-  color: var(--color-accent);
-  text-decoration-color: var(--color-accent);
+  color: var(--link-hover);
+  text-decoration-color: var(--link-hover);
   text-decoration-thickness: 2px;
   background-color: color-mix(in oklab, var(--color-accent) 14%, transparent);
 }
@@ -652,7 +725,30 @@ hr.slo-hr {
 }
 .post-prose a:focus-visible { outline: 2px solid var(--color-glow); outline-offset: 2px; }
 .post-prose img, .post-prose video { border-radius: var(--radius-box); margin-inline: auto; }
+/* Tables: src/lib/codeBlocks.js wraps each one in .table-wrap, a rounded frame that scrolls sideways when the table is
+   wider than the column. Without the script a table still scrolls (display: block). */
 .post-prose table { display: block; overflow-x: auto; }
+.post-prose .table-wrap {
+  margin: 1.75rem 0;
+  overflow-x: auto;
+  background: var(--color-base-200);
+  border: 1px solid color-mix(in oklab, var(--color-glow) 28%, transparent);
+  border-radius: var(--radius-box);
+}
+.post-prose .table-wrap > table { display: table; width: 100%; margin: 0; border-collapse: collapse; font-size: 0.95em; }
+.post-prose .table-wrap :where(th, td) { padding: 0.65rem 1rem; text-align: left; vertical-align: top; }
+.post-prose .table-wrap th {
+  color: #fff;
+  font-weight: 600;
+  background: color-mix(in oklab, var(--color-glow) 15%, var(--color-base-200));
+  border-bottom: 1px solid color-mix(in oklab, var(--color-glow) 38%, transparent);
+}
+.post-prose .table-wrap td { border: 0; border-top: 1px solid color-mix(in oklab, var(--color-base-content) 9%, transparent); }
+.post-prose .table-wrap tbody tr { border: 0; }
+.post-prose .table-wrap tbody tr:first-child td { border-top: 0; }
+.post-prose .table-wrap tbody tr:nth-child(even) { background: rgb(255 255 255 / 0.025); }
+.post-prose .table-wrap tbody tr:hover { background: color-mix(in oklab, var(--color-glow) 9%, transparent); }
+.post-prose .table-wrap:focus-visible { outline: 2px solid var(--color-glow); outline-offset: 2px; }
 .post-prose mark {
   background: color-mix(in oklab, var(--color-accent) 35%, transparent);
   color: inherit;
@@ -663,21 +759,70 @@ hr.slo-hr {
 /* inline code (the old site gave it a base-300 chip) */
 .post-prose :not(pre) > code {
   font-family: "Ubuntu Mono", ui-monospace, monospace;
-  background-color: var(--color-base-300);
+  color: #7dd3fc;
+  background-color: color-mix(in oklab, var(--color-secondary) 10%, var(--color-base-100));
   padding: 0.15em 0.4em;
   border-radius: 0.3em;
   font-size: 0.95em;
 }
 .post-prose code::before, .post-prose code::after { content: none; }
 
-/* shiki code blocks */
+/* shiki code blocks. src/lib/codeBlocks.js wraps each one in .code-block with a header bar (language + Copy). */
 .post-prose pre.shiki {
   background-color: var(--color-base-200) !important;
-  border: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-glow) 25%, transparent);
   border-radius: var(--radius-box);
   font-family: "Ubuntu Mono", ui-monospace, monospace;
   font-size: 0.95rem;
+  line-height: 1.6;
 }
+.post-prose .code-block {
+  margin: 1.75rem 0;
+  overflow: hidden;
+  background: var(--color-base-200);
+  border: 1px solid color-mix(in oklab, var(--color-glow) 28%, transparent);
+  border-left: 3px solid var(--color-glow);
+  border-radius: var(--radius-box);
+}
+.post-prose .code-block pre.shiki {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent !important;
+  padding: 1rem 1.1rem;
+}
+.code-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 2.25rem;
+  padding: 0.25rem 0.5rem 0.25rem 1rem;
+  background: color-mix(in oklab, var(--color-glow) 11%, var(--color-base-200));
+  border-bottom: 1px solid color-mix(in oklab, var(--color-glow) 22%, transparent);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  user-select: none;
+}
+.code-lang { color: var(--color-soft); letter-spacing: 0.06em; }
+.code-copy {
+  font: inherit;
+  color: color-mix(in oklab, var(--color-base-content) 75%, transparent);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.4rem;
+  padding: 0.1rem 0.7rem;
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s, border-color 0.15s;
+}
+.code-copy:hover,
+.code-copy:focus-visible {
+  color: #fff;
+  background: color-mix(in oklab, var(--color-glow) 20%, transparent);
+  border-color: color-mix(in oklab, var(--color-glow) 45%, transparent);
+}
+.code-copy:focus-visible { outline: 2px solid var(--color-glow); outline-offset: 2px; }
+.code-copy[data-copied] { color: var(--color-success); }
 
 /* YouTube embeds */
 .post-prose .video-embed {
@@ -839,9 +984,10 @@ hr.slo-hr {
   /* the site gradient: bright violet -> blue -> cyan, blended in oklch so it never goes muddy */
   --grad-space: linear-gradient(90deg in oklch, var(--color-glow), #4f7cf5 55%, var(--color-secondary));
   --grad-space-loop: linear-gradient(45deg in oklch, var(--color-glow), var(--color-secondary), var(--color-glow), #4f7cf5, var(--color-secondary), var(--color-glow));
-  --link-rest: var(--color-peach);
-  --link-press: #ff9a57;
-  --link-visited: #d9b8a6;
+  --link-rest: var(--color-accent);   /* orange: the attention colour */
+  --link-hover: #ffa766;              /* a lighter orange */
+  --link-press: #ffd2ad;              /* pale flash while pressed */
+  --link-visited: var(--color-peach); /* already viewed: soft peach */
   --article-w: 44rem;
   --wide-w: calc(1050px + 3rem);
   --nav-h: 3.5rem;       /* top nav pill height incl. its top margin (48px + 8px) */
@@ -882,6 +1028,7 @@ hr.slo-hr {
   border-radius: var(--radius-box);
   padding: 1.25rem 1rem 1rem;
   overflow: hidden;
+  box-shadow: 0 10px 26px -16px rgb(0 0 0 / 0.6), 0 0 22px -12px color-mix(in oklab, var(--color-glow) 10%, transparent);
 }
 /* author box */
 .rail-card.author-box {
@@ -1057,27 +1204,245 @@ hr.slo-hr {
 }
 
 /*------------------- Home hero -------------------*/
-/* The cosmic image shows through with a violet wash from the left (where the nebula's violet filaments are) and a
-   dark scrim top and bottom so the headline stays readable over the bright cyan glow. */
-.hero-frame {
-  border-color: color-mix(in oklab, var(--color-glow) 55%, transparent);
-  box-shadow: 0 0 28px color-mix(in oklab, var(--color-primary) 35%, transparent);
+/* Full-bleed: it sits above the page grid (BaseLayout's "hero" slot) and, from xl, runs up under the nav pill.
+   Back to front: blurred nebula (slow drift) -> three layers of twinkling stars -> a rare shooting star -> scrim
+   (violet wash from the left, where the nebula's violet filaments are, plus dark top/bottom so the headline stays
+   readable over the bright cyan). The whole background dissolves into the page at the bottom. All motion is off under
+   prefers-reduced-motion. */
+.hero {
+  --px: 0;
+  --py: 0;
+  position: relative;
+  /* flex, not grid: absolutely positioned children of a grid container are sized to its content box, which would
+     leave a margin around the background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: clamp(30rem, 82svh, 48rem);
+  padding: 4.5rem 1.5rem 6rem;
 }
+@media (min-width: 80rem) {
+  .hero {
+    margin-top: calc(-1 * var(--nav-h));
+    padding-top: calc(var(--nav-h) + 3rem);
+  }
+}
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: size; /* the stars are positioned in cqw/cqh of this box */
+  background: var(--color-base-300); /* opaque, so the page's fixed stars do not show through the hero */
+}
+/* depth layers: each moves a different distance with the pointer */
+.hero-depth {
+  position: absolute;
+  inset: -3rem; /* bleed, so neither the blur nor the parallax ever shows an edge */
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.hero-depth--far { transform: translate3d(calc(var(--px) * -18px), calc(var(--py) * -12px), 0); }
+.hero-depth--near { transform: translate3d(calc(var(--px) * -34px), calc(var(--py) * -22px), 0); }
+.hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: hero-drift 52s ease-in-out infinite alternate;
+}
+@keyframes hero-drift {
+  from { transform: scale(1) translate3d(0, 0, 0); }
+  to { transform: scale(1.09) translate3d(-1.2%, -0.8%, 0); }
+}
+
+.hero-stars {
+  position: absolute;
+  top: 3rem; /* undo the layer's bleed: positions are relative to the visible hero */
+  left: 3rem;
+  border-radius: 50%;
+  background: transparent;
+  animation: hero-twinkle 6s ease-in-out infinite;
+}
+.hero-stars--fine { width: 1px; height: 1px; }
+.hero-stars--mid { width: 2px; height: 2px; animation-duration: 8s; animation-delay: -3s; }
+.hero-stars--glow { width: 3px; height: 3px; animation-duration: 11s; animation-delay: -6s; }
+@keyframes hero-twinkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.hero-shoot {
+  position: absolute;
+  top: 14%;
+  left: 62%;
+  width: 7rem;
+  height: 2px;
+  rotate: 28deg;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.9));
+  filter: drop-shadow(0 0 4px #b79cff);
+  animation: hero-shoot 15s linear 4s infinite;
+}
+@keyframes hero-shoot {
+  0% { opacity: 0; translate: 0 0; }
+  1% { opacity: 1; }
+  5% { opacity: 0; translate: 16rem 8.5rem; }
+  100% { opacity: 0; translate: 16rem 8.5rem; }
+}
+
 .hero-scrim {
+  position: absolute;
+  inset: 0;
   background:
+    /* the bottom dissolves into the page colour, not into transparency */
+    linear-gradient(transparent 55%, var(--color-base-300) 98%),
     linear-gradient(110deg, color-mix(in oklab, var(--color-primary) 42%, transparent), transparent 62%),
-    linear-gradient(rgb(7 10 26 / 0.6), rgb(7 10 26 / 0.33) 50%, rgb(7 10 26 / 0.6));
+    linear-gradient(rgb(2 3 11 / 0.7), rgb(2 3 11 / 0.3) 30%, rgb(2 3 11 / 0.45) 70%, rgb(2 3 11 / 0.7));
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 56rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  text-align: center;
 }
 .hero-copy { text-shadow: 0 2px 18px rgb(0 0 0 / 0.65); }
+.hero-title {
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  font-size: clamp(2.25rem, 1.4rem + 3.6vw, 4rem);
+}
+.hero-sub { max-width: 40rem; font-size: 1.0625rem; }
+.hero-actions { display: flex; flex-flow: row wrap; justify-content: center; gap: 1rem; padding-top: 0.5rem; width: 100%; }
+
+/* the arrow at the bottom of the hero: two chevrons that cascade downwards, pointing at what is below */
+.hero-cue {
+  position: absolute;
+  z-index: 1;
+  bottom: 1.25rem;
+  left: 0;
+  right: 0;
+  margin-inline: auto; /* centred without `translate`, which the entrance animation uses */
+  width: 4rem;
+  height: 4.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #e4dcff;
+  filter: drop-shadow(0 0 9px color-mix(in oklab, var(--color-glow) 85%, transparent));
+  border-radius: 9999px;
+  transition: color 0.2s ease, filter 0.2s ease;
+}
+.hero-cue svg {
+  display: block;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-block: -0.8rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: hero-cue 2.2s ease-in-out infinite;
+}
+.hero-cue svg:nth-child(2) { animation-delay: 0.3s; opacity: 0.6; }
+@keyframes hero-cue {
+  0%   { opacity: 0; translate: 0 -8px; }
+  35%  { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; translate: 0 10px; }
+}
+.hero-cue:hover, .hero-cue:focus-visible {
+  color: var(--link-hover);
+  filter: drop-shadow(0 0 10px color-mix(in oklab, var(--link-hover) 60%, transparent));
+}
+.hero-cue:hover svg { animation-duration: 1.2s; }
+.hero-cue:focus-visible { outline: 2px solid var(--link-hover); outline-offset: 2px; }
+@media (max-width: 40rem) { .hero-cue { bottom: 0.5rem; } }
+
+/* the first line: a prompt, the typed word and a blinking caret (the script lives in Hero.astro) */
+.hero-eyebrow {
+  font-family: var(--font-mono, 'Ubuntu Mono', ui-monospace, monospace);
+  font-size: 1.125rem;
+  letter-spacing: 0.04em;
+  min-height: 1.75rem;
+  color: color-mix(in oklab, var(--color-base-content) 88%, transparent);
+  cursor: pointer; /* a hidden extra: click it for the next quote (see Hero.astro) */
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.hero-prompt { color: var(--color-soft); margin-right: 0.6ch; }
+.hero-typed { transition: color 0.35s ease; }
+.hero-typed[data-decoding] { color: var(--color-secondary); transition: none; } /* cyan while it scrambles, then it locks in */
+.hero-caret {
+  display: inline-block;
+  width: 0.6ch;
+  height: 1.1em;
+  margin-left: 0.15ch;
+  vertical-align: -0.17em;
+  background: var(--color-secondary);
+  box-shadow: 0 0 10px var(--color-secondary);
+  animation: hero-blink 1.1s steps(1) infinite;
+}
+.hero-caret[data-typing] { animation: none; }
+@keyframes hero-blink { 50% { opacity: 0; } }
+
+/* entrance: everything rises in one after the other */
+.hero-rise { animation: hero-rise 0.85s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0ms) backwards; }
+@keyframes hero-rise {
+  from { opacity: 0; translate: 0 14px; filter: blur(6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero *, .hero *::before, .hero *::after { animation: none !important; transition: none !important; }
+  .hero-shoot { display: none; }
+}
 
 /*------------------- Links, tags, buttons -------------------*/
-/* Standalone links ("All posts ->", "Repo", footer): same peach -> orange behaviour as links in post content. */
+/* Call-to-action buttons: a slow glow pulse while idle and a light sweep across on hover/focus.
+   Used on the home hero and the 404. */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  animation: btn-pulse 3.4s ease-in-out 1.8s infinite;
+}
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  translate: -130% 0;
+  background: linear-gradient(105deg, transparent 32%, rgb(255 255 255 / 0.38) 50%, transparent 68%);
+  pointer-events: none;
+}
+.btn-shine:hover, .btn-shine:focus-visible { animation: none; }
+.btn-shine:hover::after, .btn-shine:focus-visible::after {
+  translate: 130% 0;
+  transition: translate 0.75s ease;
+}
+@keyframes btn-pulse {
+  0%, 100% { box-shadow: 0 0 12px 0 color-mix(in oklab, var(--color-glow) 40%, transparent); }
+  50% { box-shadow: 0 0 26px 3px color-mix(in oklab, var(--color-glow) 70%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-shine { animation: none; }
+  .btn-shine::after { display: none; }
+}
+
+/* Standalone links ("All posts ->", "Repo", footer): orange, lighter on hover, like links in post content. */
 a.link {
   color: var(--link-rest);
   text-decoration-color: var(--color-accent);
   text-underline-offset: 4px;
 }
-a.link:hover { color: var(--color-accent); }
+a.link:hover { color: var(--link-hover); text-decoration-color: var(--link-hover); }
 
 /* Tags: soft violet outline; as links they light up bright violet on hover. */
 span.badge-outline, a.badge-outline:not(:hover) { --badge-color: var(--color-soft); }
@@ -1092,5 +1457,5 @@ a.badge-outline:hover {
 
 /* A tinted outline button, for sitting over the hero image: a faint fill of its own colour at rest. */
 .btn-tonal:not(:hover):not(:focus-visible) {
-  --btn-bg: color-mix(in oklab, var(--btn-color) 14%, rgb(7 10 26 / 0.55));
+  --btn-bg: color-mix(in oklab, var(--btn-color) 14%, rgb(2 3 11 / 0.55));
 }

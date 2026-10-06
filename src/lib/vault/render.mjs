@@ -81,7 +81,19 @@ export async function renderNote(note, vault, { emitAsset, shikiTheme = 'night-o
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
     .use(rehypeSlug)
-    .use(rehypeShiki, { theme: shikiTheme, fallbackLanguage: 'text' })
+    .use(rehypeShiki, {
+      theme: shikiTheme,
+      fallbackLanguage: 'text',
+      // the language goes onto the <pre> (data-language) so the page can label the code block
+      transformers: [
+        {
+          name: 'language-attribute',
+          pre(node) {
+            node.properties['data-language'] = this.options.lang;
+          },
+        },
+      ],
+    })
     .use(rehypeHeadings, headings)
     .use(rehypeReadingTime, stats)
     .use(rehypeStringify);

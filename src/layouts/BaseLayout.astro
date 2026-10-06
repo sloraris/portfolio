@@ -4,6 +4,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import TopNav from '../components/TopNav.astro';
 import { SITE } from '../config';
+import { sky } from '../lib/sky';
 
 interface Props {
   title?: string;
@@ -22,6 +23,14 @@ interface Props {
 
 const { title = SITE.title, description = SITE.description, image, ogType, layout = 'wide', toc } = Astro.props;
 const hasAside = Astro.slots.has('aside');
+
+// A faint, static starfield fixed behind the whole site: sparse and dim, so it reads as depth rather than decoration.
+// Cards, panels and the home hero are opaque and cover it.
+const stars = [
+  sky(34, 3, ['rgb(255 255 255 / .26)', 'rgb(217 204 255 / .22)'], 0, 'v'),
+  sky(10, 11, ['rgb(255 255 255 / .2)', 'rgb(191 233 255 / .2)'], 0, 'v'),
+  sky(4, 47, ['rgb(183 156 255 / .3)', 'rgb(125 211 252 / .26)'], 2, 'v'),
+];
 ---
 
 <!doctype html>
@@ -30,8 +39,14 @@ const hasAside = Astro.slots.has('aside');
     <BaseHead title={title} description={description} image={image} ogType={ogType} />
   </head>
   <body>
-    <div class="nav-bottom-space flex flex-col bg-base-300 text-base-content min-h-screen min-w-[350px] max-w-[100vw]">
+    <div class="page-stars" aria-hidden="true">
+      <i style={`box-shadow:${stars[0]}`}></i><i class="mid" style={`box-shadow:${stars[1]}`}></i><i class="big" style={`box-shadow:${stars[2]}`}></i>
+    </div>
+    <div class="nav-bottom-space flex flex-col text-base-content min-h-screen min-w-[350px] max-w-[100vw]">
       <TopNav toc={toc} />
+
+      {/* optional full-bleed hero (home): sits above the grid so it can span the whole window, under the nav pill */}
+      {Astro.slots.has('hero') && <slot name="hero" />}
 
       {layout === 'bare'
         ? (
@@ -59,3 +74,8 @@ const hasAside = Astro.slots.has('aside');
     </div>
   </body>
 </html>
+
+<script>
+  import '../lib/headingAnchors.js';
+  import '../lib/codeBlocks.js';
+</script>

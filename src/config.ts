@@ -4,13 +4,37 @@ export const SITE = {
   title: 'sloraris',
   url: 'https://sloraris.dev',
   description:
-    'Parker Owings (sloraris): self-hosted infrastructure, networking, automation and security. Projects, write-ups, and a fair amount of sarcasm.',
+    'Parker Owings (sloraris): self-hosted infrastructure, platforms, networking, and automation, all from a security background. Projects, write-ups, and a fair amount of sarcasm.',
   github: 'https://github.com/sloraris',
   linkedin: 'https://linkedin.com/in/parker-owings',
+  email: 'sloraris@sloraris.dev',
 
   // null = built-in placeholder
   logo: '/logo.svg' as string | null,
   heroImage: '/cosmic.jpg' as string | null,
+  // The one-liners that decode themselves on the home hero's first line, in random order. The first one is shown
+  // before (and without) any script; a single entry just shows it. Keep them short (about 27 characters or fewer)
+  // so they fit on one line on a phone.
+  heroQuotes: [
+    "It's working!",
+    "It's always DNS.",
+    'Shall we play a game?',
+    "Don't panic.",
+    'Stay on target.',
+    'Make it so.',
+    'Trust, but verify.',
+    'Works on my machine.',
+    "I'm in.",
+    'Hello, world.',
+    'Never tell me the odds.',
+    'Turn it off and on again.',
+    'sudo make me a sandwich.',
+    'Resistance is futile.',
+    'Uptime is a feature.',
+    "I'm the world's best backwards driver!",
+    "Those WERE the droids I was looking for...",
+    "I'd smack ya if I had a hand.",
+  ] as string[],
 
   // Shown in the nav pill's About button and in the author box at the end of every post, page and project.
   author: {

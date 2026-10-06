@@ -1,44 +1,23 @@
 ---
-import { getPosts, getFeaturedProjects, hasProjects } from '../lib/content';
+import { getPosts, getFeaturedProjects } from '../lib/content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostCard from '../components/PostCard.astro';
 import ProjectCard from '../components/ProjectCard.astro';
-import { SITE } from '../config';
+import Hero from '../components/Hero.astro';
 
 const posts = await getPosts();
 const latest = posts.slice(0, 3);
 const featured = await getFeaturedProjects(4);
-const showProjects = await hasProjects();
 ---
 
 <BaseLayout>
-  <div class="mockup-window border hero-frame bg-base-200">
-    <div class="relative overflow-hidden rounded-xl">
-      {SITE.heroImage
-        ? <img src={SITE.heroImage} alt="" class="absolute inset-0 w-full h-full object-cover" />
-        : <div class="absolute inset-0 cosmic"></div>}
-      <div class="absolute inset-0 hero-scrim"></div>
-      <div class="relative px-6 py-16 sm:py-24 text-center flex flex-col items-center gap-4">
-        <h1 class="text-3xl sm:text-5xl font-bold text-balance max-w-3xl hero-copy">
-          I build infrastructure that stays up, and occasionally break it on purpose.
-        </h1>
-        <p class="max-w-xl hero-copy">
-          Self-hosted infrastructure, networking, and automation, with a security background. This is where the
-          projects and write-ups live.
-        </p>
-        <div class="flex flex-row flex-wrap justify-center gap-4 pt-2 w-full">
-          {/* One primary action: Projects. Posts is primary only while there are no projects to point at. */}
-          {showProjects && <a href="/projects/" class="btn btn-primary btn-wide hover:scale-[1.02]">Projects</a>}
-          <a href="/posts/" class:list={['btn btn-wide hover:scale-[1.02]', showProjects ? 'btn-secondary btn-outline btn-tonal' : 'btn-primary']}>Read Posts</a>
-          <a href={SITE.github} target="_blank" rel="noopener" class="btn btn-ghost btn-wide hover:scale-[1.02]">GitHub</a>
-        </div>
-      </div>
-    </div>
-  </div>
+  <Fragment slot="hero">
+    <Hero target={featured.length > 0 ? 'featured' : 'latest'} />
+  </Fragment>
 
   {featured.length > 0 && (
     <>
-      <h2 class="text-3xl w-full font-bold mb-4 mt-10">Featured projects</h2>
+      <h2 id="featured" class="text-3xl w-full font-bold mb-4 mt-10">Featured projects</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {featured.map((project) => <ProjectCard project={project} />)}
       </div>
@@ -48,7 +27,7 @@ const showProjects = await hasProjects();
     </>
   )}
 
-  <h2 class="text-3xl w-full font-bold mb-4 mt-10">Hot off the CPU</h2>
+  <h2 id="latest" class="text-3xl w-full font-bold mb-4 mt-10">Hot off the CPU</h2>
 
   {latest.length > 0
     ? (

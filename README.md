@@ -263,14 +263,21 @@ Everything lives in `public/` and is referenced by URL path in `src/config.ts`.
 | `public/apple-touch-icon.png` | 180x180. Picked up automatically if the file exists.                         |
 | `public/android-chrome-*.png`, `site.webmanifest` | Home-screen icons; the manifest is linked automatically. |
 | `public/cosmic.jpg`           | `heroImage: '/cosmic.jpg'` for the home page hero (already set).             |
+| `heroQuotes` in `src/config.ts` | The one-liners that scramble into each other on the hero's first line, in random order (the first is shown without JavaScript; one entry = no animation). Click or tap the line for the next one. Keep them to about 27 characters so they fit one line on a phone. |
 
 The logo and favicons from the old site are already in place. Until you set the avatar and hero image, the site shows a gradient avatar placeholder and a CSS starfield.
 
 ## Making it yours
 
 - Colors, radii: the `daisyui/theme` block at the top of `src/styles/global.css`. Bright violet (`glow`), soft violet
-  (`soft`) and peach (links at rest) are `@theme static` tokens right under it. Orange is reserved for links,
-  highlights and the important / warning callouts, so it draws the eye when it appears.
+  (`soft`) and peach (links you have already visited) are `@theme static` tokens right under it. Orange is reserved
+  for links, highlights and the important / warning callouts, so it draws the eye when it appears. The link colors
+  (`--link-rest`, `--link-hover`, `--link-press`, `--link-visited`) sit in `:root` further down.
+- Reading experience in articles (`.post-prose` in `global.css`): h2 headings get a gradient `>`, h2 to h4 get a `#`
+  link that copies the section URL, `---` renders as a row of three stars, code blocks get a header bar with the
+  language and a Copy button (`src/lib/codeBlocks.js`; the language comes from a Shiki transformer in
+  `src/lib/vault/render.mjs`), and tables are framed and scroll sideways on narrow screens. All of it is plain CSS
+  or a small script, so readers without JavaScript still get styled code and tables, just without the header bar.
 - Name, bio, links: `src/config.ts`.
 - Fonts (Exo 2, Ubuntu, Ubuntu Mono) are self-hosted, nothing loads from Google.
 - No analytics are included (the old site's Google tag was deliberately not carried over).

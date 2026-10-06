@@ -4,15 +4,20 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
 <BaseLayout title="404: Not Found" layout="bare">
   <div class="hyperspace-container">
-    <div class="star-field"></div>
+    <!-- everything you see move here is drawn on this one canvas (script below) -->
+    <canvas class="sky" aria-hidden="true"></canvas>
+    <!-- the occasional shooting star -->
+    <i class="shoot" style="--x: 14%; --y: 16%; --rot: 24deg; --dx: 22rem; --dy: 9.8rem; --dur: 14s; --delay: 3s"></i>
+    <i class="shoot" style="--x: 66%; --y: 8%; --rot: 33deg; --dx: 20rem; --dy: 13rem; --dur: 21s; --delay: 9s"></i>
+    <i class="shoot" style="--x: 38%; --y: 52%; --rot: 18deg; --dx: 24rem; --dy: 7.8rem; --dur: 27s; --delay: 17s"></i>
+    <div class="flash"></div>
   </div>
   <div class="content-wrapper">
     <div class="text-center">
-      <h1 class="text-9xl font-bold mb-4">Uh Oh...</h1>
-      <h2 class="text-9xl font-bold mb-2">404</h2>
-      <h3 class="text-2xl mb-4">Looks like this page is lost in hyperspace.</h3>
-      <p class="text-xl mb-6">You tryna make the kessel run or something?</p>
-      <a class="btn btn-primary mt-4" href="/">Return to Known Space</a>
+      <h1 class="text-7xl sm:text-8xl font-bold mb-4">Uh Oh...</h1>
+      <h2 class="text-7xl sm:text-8xl font-bold mb-2">404</h2>
+      <h3 class="text-2xl mb-4">Looks like this page is lost in uncharted space.</h3>
+      <a class="btn btn-primary btn-lg btn-shine warp-btn mt-4" href="/" data-warp>Return to Known Space</a>
     </div>
   </div>
 </BaseLayout>
@@ -29,36 +34,307 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     z-index: 0;
   }
 
-  .star-field {
+  .sky {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    height: 1px;
-    width: 1px;
-    background-color: #fff;
-    border-radius: 50%;
-    box-shadow: -42vw -4vh 0px 0px #fff,25vw -41vh 0px 0px #fff,-20vw 49vh 0px 1px #fff,5vw 40vh 1px 1px #fff,29vw 19vh 1px 0px #fff,-44vw -13vh 0px 0px #fff,46vw 41vh 0px 1px #fff,-3vw -45vh 0px 1px #fff,47vw 35vh 1px 0px #fff,12vw -8vh 1px 0px #fff,-34vw 48vh 1px 1px #fff,32vw 26vh 1px 1px #fff,32vw -41vh 1px 1px #fff,0vw 37vh 1px 1px #fff,34vw -26vh 1px 0px #fff,-14vw -49vh 1px 0px #fff,-12vw 45vh 0px 1px #fff,-44vw -33vh 0px 1px #fff,-13vw 41vh 0px 0px #fff,-36vw -11vh 0px 1px #fff,-23vw -24vh 1px 0px #fff,-38vw -27vh 0px 1px #fff,16vw -19vh 0px 0px #fff,28vw 33vh 1px 0px #fff,-49vw -4vh 0px 0px #fff,16vw 32vh 0px 1px #fff,36vw -18vh 1px 0px #fff,-25vw -30vh 1px 0px #fff,-23vw 24vh 0px 1px #fff,-2vw -35vh 1px 1px #fff,-25vw 9vh 0px 0px #fff,-15vw -34vh 0px 0px #fff,-8vw -19vh 1px 0px #fff,-20vw -20vh 1px 1px #fff,42vw 50vh 0px 1px #fff,-32vw 10vh 1px 0px #fff,-23vw -17vh 0px 0px #fff,44vw 15vh 1px 0px #fff,-40vw 33vh 1px 1px #fff,-43vw 8vh 0px 0px #fff,-48vw -15vh 1px 1px #fff,-24vw 17vh 0px 0px #fff,-31vw 50vh 1px 0px #fff,36vw -38vh 0px 1px #fff,-7vw 48vh 0px 0px #fff,15vw -32vh 0px 0px #fff,29vw -41vh 0px 0px #fff,2vw 37vh 1px 0px #fff,7vw -40vh 1px 1px #fff,15vw 18vh 0px 0px #fff,25vw -13vh 1px 1px #fff,-46vw -12vh 1px 1px #fff,-18vw 22vh 0px 0px #fff,23vw -9vh 1px 0px #fff,50vw 12vh 0px 1px #fff,45vw 2vh 0px 0px #fff,
-      /* New stars start here */
-      -38vw -46vh 0px 0px #fff,22vw 38vh 1px 1px #fff,-11vw -22vh 1px 0px #fff,25vw 30vh 0px 1px #fff,15vw -49vh 0px 0px #fff,-26vw -32vh 1px 1px #fff,-32vw 41vh 1px 0px #fff,0vw -37vh 1px 1px #fff,43vw 28vh 0px 1px #fff,-9vw 9vh 1px 0px #fff,-17vw -23vh 1px 0px #fff,20vw -17vh 1px 1px #fff,-4vw -37vh 1px 1px #fff,-6vw -46vh 1px 1px #fff,38vw 34vh 1px 0px #fff,2vw -49vh 1px 0px #fff,16vw -43vh 0px 1px #fff,48vw 6vh 0px 0px #fff,-13vw 29vh 0px 1px #fff,-32vw 48vh 1px 1px #fff,32vw 4vh 1px 0px #fff,4vw -45vh 0px 1px #fff,41vw -13vh 1px 0px #fff,-36vw -38vh 0px 1px #fff,-33vw 9vh 1px 1px #fff,25vw -20vh 0px 0px #fff,-10vw -16vh 1px 1px #fff,7vw 28vh 0px 1px #fff,29vw -11vh 1px 0px #fff,-27vw 19vh 1px 0px #fff,33vw -50vh 1px 0px #fff,18vw 27vh 0px 1px #fff,-15vw -22vh 1px 1px #fff,-31vw 39vh 1px 0px #fff,40vw 45vh 0px 0px #fff,-38vw -10vh 0px 1px #fff,37vw 48vh 1px 0px #fff,43vw -23vh 0px 1px #fff,23vw -35vh 1px 1px #fff,-31vw -14vh 1px 0px #fff,48vw -38vh 1px 0px #fff,-24vw 47vh 0px 1px #fff,-38vw -30vh 1px 0px #fff,-19vw 37vh 0px 0px #fff,26vw 16vh 1px 1px #fff,8vw -13vh 1px 0px #fff,-24vw 1vh 1px 1px #fff,-30vw -25vh 0px 1px #fff,45vw 49vh 1px 0px #fff,11vw 8vh 0px 0px #fff,-19vw -13vh 0px 1px #fff,-41vw -35vh 1px 1px #fff,-13vw -49vh 1px 0px #fff,-36vw -49vh 0px 0px #fff,41vw 34vh 1px 1px #fff,-23vw 6vh 0px 0px #fff,-4vw -9vh 1px 0px #fff,38vw -51vh 1px 1px #fff,-16vw 4vh 0px 0px #fff,2vw 47vh 0px 0px #fff,36vw -29vh 1px 1px #fff,-42vw 24vh 0px 0px #fff,-7vw 5vh 0px 1px #fff,-34vw 24vh 1px 0px #fff,8vw -48vh 1px 1px #fff,18vw -30vh 0px 1px #fff,33vw -47vh 1px 1px #fff,24vw 6vh 0px 1px #fff,2vw -47vh 1px 0px #fff,47vw -48vh 1px 1px #fff,39vw -43vh 1px 1px #fff,-43vw -16vh 0px 1px #fff,21vw 46vh 0px 0px #fff,-15vw -28vh 1px 1px #fff,48vw 17vh 1px 0px #fff,-12vw 18vh 0px 0px #fff,-24vw 40vh 0px 1px #fff,29vw -4vh 1px 1px #fff,-9vw -13vh 1px 0px #fff,-39vw 48vh 0px 1px #fff,-42vw -35vh 0px 0px #fff,39vw -26vh 1px 1px #fff,40vw -12vh 1px 1px #fff,2vw 37vh 0px 0px #fff,32vw 38vh 0px 1px #fff,19vw -17vh 1px 1px #fff,14vw 17vh 0px 0px #fff,38vw 36vh 1px 0px #fff,-26vw -11vh 0px 0px #fff,17vw -38vh 1px 1px #fff,21vw 37vh 1px 0px #fff,40vw 9vh 0px 1px #fff,-20vw -4vh 1px 1px #fff,47vw 6vh 1px 0px #fff,-34vw 51vh 1px 1px #fff,51vw -48vh 1px 0px #fff,-38vw -31vh 1px 1px #fff,41vw -33vh 0px 0px #fff,7vw 28vh 1px 1px #fff;
-    animation: hyperspace 6s ease-in-out infinite;
-    transform-style: preserve-3d;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
   }
 
-  @keyframes hyperspace {
-    0%, 100% {
-      transform: perspective(500px) rotateZ(0deg) translateZ(0);
-    }
-    50% {
-      transform: perspective(500px) rotateZ(10deg) translateZ(300px);
-    }
+  .shoot {
+    position: absolute;
+    top: var(--y);
+    left: var(--x);
+    width: 8rem;
+    height: 2px;
+    rotate: var(--rot);
+    opacity: 0;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.95));
+    filter: drop-shadow(0 0 4px #b79cff);
+    animation: shoot var(--dur) linear var(--delay) infinite;
   }
+  @keyframes shoot {
+    0% { opacity: 0; translate: 0 0; }
+    1% { opacity: 1; }
+    5% { opacity: 0; translate: var(--dx) var(--dy); }
+    100% { opacity: 0; translate: var(--dx) var(--dy); }
+  }
+  /* no shooting stars while the stars themselves are being flung about */
+  :global(body:has(.warp-btn:hover, .warp-btn:focus-visible)) .shoot,
+  :global(body.warp-jump) .shoot { visibility: hidden; }
 
   .content-wrapper {
     position: relative;
     min-height: 80vh;
     display: flex;
-    justify-content: ;
+    justify-content: center;
     align-items: center;
     z-index: 1;
+    text-shadow: 0 0 20px rgb(0 0 0 / 0.85), 0 0 4px rgb(0 0 0 / 0.6); /* keeps the text readable over the streaks */
+  }
+
+  /* ---- the button: hold it and the stars go to lightspeed; click it and you jump ---- */
+  .warp-btn {
+    letter-spacing: 0.02em;
+    transition: letter-spacing 0.3s ease, scale 0.2s ease;
+  }
+  .warp-btn:hover,
+  .warp-btn:focus-visible {
+    letter-spacing: 0.07em;
+    scale: 1.05;
+    box-shadow: 0 0 34px 4px color-mix(in oklab, var(--color-glow) 75%, transparent);
+  }
+
+  /* click: a flash from the centre, the text fades, then the page changes (script below) */
+  .flash {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 50%, #fff 0, #d9ccff 14%, #8b5cf6 38%, transparent 72%);
+  }
+  :global(body.warp-jump) .flash { opacity: 1; transition: opacity 0.45s ease-in 0.2s; }
+  :global(body.warp-jump) .content-wrapper { opacity: 0; transition: opacity 0.3s ease; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shoot { display: none; }
+    .warp-btn, .warp-btn:hover, .warp-btn:focus-visible { transition: none; letter-spacing: 0.02em; scale: none; }
   }
 </style>
+
+<script>
+  const link = document.querySelector<HTMLAnchorElement>('[data-warp]');
+  const canvas = document.querySelector<HTMLCanvasElement>('.sky');
+  const ctx = canvas?.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+
+  // `target` is how fast we want to be going: 0 = rest, 1 = warp (hover/focus), 4 = the jump (click).
+  let target = 0;
+  let wake: (() => void) | undefined;
+
+  if (canvas && ctx) {
+    const COLORS = ['255 255 255', '255 255 255', '255 255 255', '217 204 255', '191 233 255'];
+    const WARP_COLORS = ['255 255 255', '255 255 255', '255 255 255', '183 156 255', '125 211 252'];
+
+    // The resting sky: stars that sit still. `r` is the distance from the middle of the screen, `r0` where it lives.
+    // In warp they are flung outwards (along the line from the middle) until they are off the screen. When the warp
+    // ends, the ones that left come back out of the hyperspace point: they fade in halfway between the middle and home,
+    // rush the rest of the way, then brake hard and creep into place (see `settle`).
+    type Rest = {
+      nx: number; ny: number; size: number; alpha: number; c: string; v: number; r: number; pr: number; r0: number; ux: number; uy: number;
+      ret: boolean; // coming home
+      t: number; // seconds since it started coming home (negative = still waiting its turn)
+      d0: number; // how far from home it started (signed)
+      a: number; // fade, 0..1
+    };
+    // The warp field: streaks that only exist while it is on.
+    type Fly = { a: number; r: number; v: number; c: string };
+
+    let w = 0;
+    let h = 0;
+    let cx = 0;
+    let cy = 0;
+    let maxR = 1;
+
+    const rand = Math.random;
+    let rest: Rest[] = [];
+    const geometry = () => {
+      for (const s of rest) {
+        const dx = (s.nx - 0.5) * w;
+        const dy = (s.ny - 0.5) * h;
+        s.r0 = Math.hypot(dx, dy) || 1;
+        s.ux = dx / s.r0;
+        s.uy = dy / s.r0;
+      }
+    };
+    const sizeCanvas = () => {
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      w = innerWidth;
+      h = innerHeight;
+      cx = w / 2;
+      cy = h / 2;
+      maxR = Math.hypot(w, h) / 2;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      geometry();
+      if (!running) for (const s of rest) s.r = s.pr = s.r0; // at rest everything sits at home
+    };
+
+    let running = false;
+    sizeCanvas();
+    rest = Array.from({ length: Math.round(Math.min(260, (w * h) / 6500)) }, () => {
+      const big = rand() < 0.12;
+      return {
+        nx: rand(),
+        ny: rand(),
+        size: big ? 1.1 + rand() * 0.7 : 0.55 + rand() * 0.55,
+        alpha: big ? 0.9 : 0.4 + rand() * 0.5,
+        c: COLORS[Math.floor(rand() * COLORS.length)],
+        v: 0.6 + rand() * 0.9, // depth: how eagerly it leaves
+        r: 0, pr: 0, r0: 1, ux: 0, uy: 0,
+        ret: false, t: 0, d0: 0, a: 1,
+      };
+    });
+    geometry();
+    for (const s of rest) s.r = s.pr = s.r0;
+
+    const spawn = (anywhere: boolean): Fly => ({
+      a: rand() * Math.PI * 2,
+      r: (anywhere ? rand() : rand() * 0.06) * maxR,
+      v: 0.5 + rand() * 1.1,
+      c: WARP_COLORS[Math.floor(rand() * WARP_COLORS.length)],
+    });
+    const fly: Fly[] = Array.from({ length: Math.round(Math.min(380, (w * h) / 4500)) }, () => spawn(true));
+
+    let speed = 0;
+    let last = 0;
+
+    // How much of the way home is still to go, `t` seconds after setting off: most of it in a rush, the last bit a crawl.
+    const settle = (t: number) => 0.84 * Math.exp(-12 * t) + 0.16 * Math.exp(-2.4 * t);
+    // The warp is over: stars that are off the screen restart halfway between the middle and home (invisible, each
+    // after its own short wait); the ones still in view just ease back.
+    const release = () => {
+      for (const s of rest) {
+        const x = cx + s.ux * s.r;
+        const y = cy + s.uy * s.r;
+        const gone = x < -12 || x > w + 12 || y < -12 || y > h + 12;
+        if (gone) {
+          s.r = s.r0 * 0.5;
+          s.a = 0;
+          s.t = -Math.random() * 0.22;
+        } else {
+          s.t = 0;
+        }
+        s.d0 = s.r - s.r0;
+        s.pr = s.r;
+        s.ret = true;
+      }
+    };
+
+    const draw = (dt: number) => {
+      if (dt > 0) speed += (target - speed) * (1 - Math.exp(-dt * (target > speed ? 3.2 : 3.4)));
+      ctx.clearRect(0, 0, w, h);
+      ctx.lineCap = 'round';
+
+      // 1. the resting stars: leaving while the warp is on, gliding home when it is off
+      let away = false;
+      for (const s of rest) {
+        if (dt > 0) {
+          if (target > 0) {
+            s.ret = false;
+            s.a = Math.min(1, s.a + dt * 8);
+            const depth = s.r / maxR;
+            s.r = Math.min(maxR * 1.15, s.r + (60 + speed * 1000 * s.v) * (0.25 + depth * 2.2) * dt);
+          } else if (s.ret) {
+            s.t += dt;
+            if (s.t > 0) {
+              s.a = Math.min(1, s.a + dt * 7); // fades in over the first moments of the rush
+              s.r = s.r0 + s.d0 * settle(s.t);
+              if (s.t > 0.3 && Math.abs(s.r - s.r0) < 0.3) {
+                s.r = s.r0;
+                s.ret = false;
+                s.a = 1;
+              }
+            }
+          }
+        }
+        if (s.r !== s.r0 || s.ret) away = true;
+        if (s.ret && s.t <= 0 && target === 0) {
+          s.pr = s.r;
+          continue; // still waiting, nothing to see yet
+        }
+        if (s.r > maxR * 1.1 && target > 0) {
+          s.pr = s.r;
+          continue; // parked off the edge of the screen
+        }
+        const x = cx + s.ux * s.r;
+        const y = cy + s.uy * s.r;
+        const tail = dt > 0 ? Math.max(-260, Math.min(260, ((s.r - s.pr) / dt) * 0.05)) : 0;
+        s.pr = s.r;
+        ctx.strokeStyle = ctx.fillStyle = `rgb(${s.c} / ${(s.alpha * s.a).toFixed(2)})`;
+        if (Math.abs(tail) < 1.5) {
+          ctx.beginPath();
+          ctx.arc(x, y, s.size, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.lineWidth = s.size * 1.6;
+          ctx.beginPath();
+          ctx.moveTo(cx + s.ux * (s.r - tail), cy + s.uy * (s.r - tail));
+          ctx.lineTo(x, y);
+          ctx.stroke();
+        }
+      }
+
+      // 2. the warp field itself: fades in with the speed
+      const visible = Math.min(1, speed * 2.2);
+      if (visible > 0.01) {
+        for (const s of fly) {
+          const depth = s.r / maxR; // 0 at the middle, 1 at the corners: things move faster the closer they get
+          s.r += (30 + speed * 900 * s.v) * (0.25 + depth * 2.2) * dt;
+          if (s.r > maxR * 1.05) Object.assign(s, spawn(false));
+          const tail = Math.min(s.r, speed * s.v * (14 + s.r * 0.34)); // the streak lengthens with speed and distance
+          const cos = Math.cos(s.a);
+          const sin = Math.sin(s.a);
+          ctx.strokeStyle = `rgb(${s.c} / ${(Math.min(1, 0.15 + depth * 1.4) * visible).toFixed(3)})`;
+          ctx.lineWidth = 0.7 + depth * 1.7;
+          ctx.beginPath();
+          ctx.moveTo(cx + cos * (s.r - tail), cy + sin * (s.r - tail));
+          ctx.lineTo(cx + cos * s.r, cy + sin * s.r);
+          ctx.stroke();
+        }
+      }
+      return away || target > 0 || speed > 0.005;
+    };
+
+    const frame = (t: number) => {
+      const dt = Math.min(0.05, (t - last) / 1000);
+      last = t;
+      if (draw(dt)) {
+        requestAnimationFrame(frame);
+      } else {
+        running = false; // everything is home and quiet: stop drawing until the next hover
+        speed = 0;
+        draw(0);
+      }
+    };
+    wake = () => {
+      if (running) return;
+      running = true;
+      last = performance.now();
+      requestAnimationFrame(frame);
+    };
+
+    draw(0);
+    addEventListener('resize', () => {
+      sizeCanvas();
+      if (!running) draw(0);
+    });
+
+    if (link && !reduce.matches) {
+      const on = () => { if (target < 1) target = 1; wake?.(); };
+      const off = () => {
+        if (target !== 1) return;
+        target = 0;
+        release();
+      };
+      link.addEventListener('pointerenter', on);
+      link.addEventListener('focus', on);
+      link.addEventListener('pointerleave', off);
+      link.addEventListener('blur', off);
+    }
+  }
+
+  // "Return to Known Space" makes the jump to lightspeed before it navigates. Anything but a plain left click
+  // (new tab, middle click...) and reduced-motion users go straight there.
+  link?.addEventListener('click', (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (reduce.matches) return;
+    e.preventDefault();
+    target = 4;
+    wake?.();
+    document.body.classList.add('warp-jump');
+    setTimeout(() => (location.href = link.href), 750);
+  });
+</script>

@@ -1,0 +1,165 @@
+---
+import { SITE } from '../config';
+import { sky } from '../lib/sky';
+
+interface Props {
+  /** id of the first section below the hero (recent projects / posts): the arrow at the bottom points and scrolls there */
+  target: string;
+}
+const { target } = Astro.props;
+const quotes = SITE.heroQuotes;
+
+// Three layers of stars (see src/lib/sky.ts); positioned in cqw/cqh of .hero-bg, so the sky scales with the hero.
+const skyFine = sky(46, 7, ['#fff', '#fff', '#d9ccff'], 0);
+const skyMid = sky(16, 21, ['#fff', '#bfe9ff', '#d9ccff'], 0);
+const skyGlow = sky(7, 99, ['#b79cff', '#7dd3fc', '#ffd9bf'], 3);
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero-bg" aria-hidden="true">
+    <div class="hero-depth hero-depth--far">
+      {SITE.heroImage
+        ? <img src={SITE.heroImage} alt="" class="hero-img blur-sm" fetchpriority="high" decoding="async" />
+        : <div class="hero-img cosmic"></div>}
+    </div>
+    <div class="hero-depth hero-depth--near">
+      <div class="hero-stars hero-stars--fine" style={`box-shadow:${skyFine}`}></div>
+      <div class="hero-stars hero-stars--mid" style={`box-shadow:${skyMid}`}></div>
+      <div class="hero-stars hero-stars--glow" style={`box-shadow:${skyGlow}`}></div>
+    </div>
+    <div class="hero-shoot"></div>
+    <div class="hero-scrim"></div>
+  </div>
+
+  <div class="hero-inner">
+    <!-- decorative: the paragraph below says the same thing in plain text -->
+    <p class="hero-eyebrow hero-rise" style="--d: 0ms" aria-hidden="true">
+      <span class="hero-prompt">&gt;</span>
+      <span class="hero-typed" data-quotes={JSON.stringify(quotes)}>{quotes[0]}</span><span class="hero-caret"></span>
+    </p>
+    <h1 id="hero-title" class="hero-title hero-copy hero-rise" style="--d: 120ms">
+      Hello, I'm sloraris.
+    </h1>
+    <p class="hero-sub hero-copy hero-rise" style="--d: 240ms">
+      This is where my projects and write-ups live. Self-hosted infrastructure, platforms, networking, and automation, all from a security background.
+    </p>
+  </div>
+
+  <!-- the one call to action: an arrow that points at the recent work and takes you there -->
+  <a class="hero-cue hero-rise" style="--d: 700ms" href={`#${target}`} aria-label="Scroll down to the latest projects and posts">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5l7 7 7-7" /></svg>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5l7 7 7-7" /></svg>
+  </a>
+</section>
+
+<script>
+  const hero = document.querySelector<HTMLElement>('.hero');
+  const typed = document.querySelector<HTMLElement>('.hero-typed');
+  const caret = document.querySelector<HTMLElement>('.hero-caret');
+  const eyebrow = document.querySelector<HTMLElement>('.hero-eyebrow');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (hero && typed && caret && !reduce.matches) {
+    // Parallax: the nebula and the stars drift a few pixels against the pointer, at different depths.
+    if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      const set = (x: number, y: number) => {
+        hero.style.setProperty('--px', x.toFixed(3));
+        hero.style.setProperty('--py', y.toFixed(3));
+      };
+      hero.addEventListener(
+        'pointermove',
+        (e) => {
+          const r = hero.getBoundingClientRect();
+          set((e.clientX - r.left) / r.width - 0.5, (e.clientY - r.top) / r.height - 0.5);
+        },
+        { passive: true },
+      );
+      hero.addEventListener('pointerleave', () => set(0, 0));
+    }
+
+    // The quote machine: the first quote is already in the HTML (so there is no layout shift and nothing is missing
+    // without JS). After a pause the line scrambles into the next quote, left to right, like a terminal decoding it.
+    let words: string[] = [];
+    try {
+      words = JSON.parse(typed.dataset.quotes ?? '[]');
+    } catch {
+      /* keep the static quote */
+    }
+
+    if (words.length > 1) {
+      let onScreen = true;
+      new IntersectionObserver(([entry]) => (onScreen = entry.isIntersecting)).observe(hero);
+
+      const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+      // do not type to nobody: hold while the tab is hidden or the hero has scrolled away
+      const ready = async () => {
+        while (document.hidden || !onScreen) await wait(400);
+      };
+
+      const GLYPHS = '01<>/\\_[]{}#$%&*+=?!;:~';
+      const glyph = () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+
+      // Scramble `from` into `to`: every position shows noise until its turn comes (left to right), then locks in.
+      // Spaces stay spaces, so the shape of the words shows through the noise.
+      // `id` is the decode this belongs to: when a newer one starts (a click), the older one quietly stops.
+      let latest = 0;
+      const decode = async (from: string, to: string, id: number) => {
+        const len = Math.max(from.length, to.length);
+        const lockAt = Array.from({ length: len }, (_, i) => 140 + i * 24 + Math.random() * 90);
+        const t0 = performance.now();
+        typed.dataset.decoding = '';
+        for (;;) {
+          await ready();
+          if (id !== latest) return;
+          const t = performance.now() - t0;
+          let out = '';
+          let done = true;
+          for (let i = 0; i < len; i++) {
+            if (t >= lockAt[i]) out += to[i] ?? '';
+            else {
+              done = false;
+              out += to[i] === ' ' ? ' ' : glyph();
+            }
+          }
+          typed.textContent = out;
+          if (done) break;
+          await wait(36);
+        }
+        delete typed.dataset.decoding;
+      };
+
+      // a shuffled bag, so every quote turns up once before any repeats, and never the same one twice in a row
+      const shuffled = (skip: number) =>
+        words
+          .map((_, i) => i)
+          .filter((i) => i !== skip)
+          .sort(() => Math.random() - 0.5);
+      let current = 0;
+      let bag = shuffled(0); // the quote on screen has had its turn
+      const next = () => {
+        if (!bag.length) bag = shuffled(current);
+        return bag.pop() as number;
+      };
+
+      let text = words[0];
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const show = async (i: number) => {
+        clearTimeout(timer);
+        if (!typed.isConnected) return; // the page was swapped out by a navigation
+        const id = ++latest;
+        const from = typed.textContent ?? text; // whatever is on screen right now, even half-scrambled
+        current = i;
+        text = words[i];
+        caret.dataset.typing = '';
+        await decode(from, text, id);
+        if (id !== latest) return;
+        delete caret.dataset.typing;
+        timer = setTimeout(() => show(next()), 2200 + text.length * 60); // longer lines get a little longer to be read
+      };
+      timer = setTimeout(() => show(next()), 2600);
+
+      // click (or tap) the line for the next quote straight away
+      eyebrow?.addEventListener('click', () => show(next()));
+    }
+  }
+</script>
