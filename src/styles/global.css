@@ -426,12 +426,12 @@ hr.slo-hr {
   .nav-logo img { height: 2rem; }
   .nav-toggle, .nav-panel, .nav-toc-btn, .nav-toc-panel { display: none; }
 
-  .nav-side { display: flex; align-items: center; gap: var(--gap); list-style: none; margin: 0; padding: 0; transition: gap 0.4s var(--ease); }
+  .nav-side { display: flex; align-items: center; gap: var(--gap); list-style: none; margin: 0; padding: 0; transition: gap 0.34s var(--ease); }
   .nav-side--right { justify-self: end; }
 
   /* left half: the three links, plus the 3-dot button that stands in for them while compact (it sits underneath
      the links, so it is only ever reachable once they have folded to zero width) */
-  .nav-left { position: relative; display: flex; align-items: center; min-width: var(--slot-sm); }
+  .nav-left { position: relative; display: flex; align-items: center; justify-content: center; min-width: var(--slot-sm); }
   .nav-dots {
     position: absolute;
     left: 0;
@@ -447,7 +447,7 @@ hr.slo-hr {
     pointer-events: none;
     transition: opacity 0.15s ease, background-color 0.15s;
   }
-  .nav-dots svg { width: 1.5rem; height: 1.5rem; }
+  .nav-dots svg { width: 1.5rem; height: 1.5rem; opacity: 0; } /* the links' own dots are what you see; this button is the tap target */
 
   .nav-link {
     position: relative;
@@ -462,7 +462,7 @@ hr.slo-hr {
     font-family: var(--font-display);
     font-size: 0.9rem;
     text-decoration: none;
-    transition: width 0.4s var(--ease), background-color 0.15s, box-shadow 0.15s, scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: width 0.34s var(--ease), background-color 0.15s, box-shadow 0.15s, scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .nav-link:hover { scale: 1.05; }
   /* Home / Posts / Projects share one violet tone, like the menu tiles on small screens.
@@ -476,11 +476,17 @@ hr.slo-hr {
   }
   .nav-link--tone:focus-visible { outline: 2px solid var(--tone); outline-offset: 2px; }
   .nav-link-icon { flex: none; width: 1.1rem; height: 1.1rem; }
+  /* Each icon carries a dot in the same place (see TopNav.astro). Folding: the words fade, the icon shrinks into its dot,
+     then the three links narrow and the dots slide together into the 3-dot button. Unfolding is the same in reverse
+     (this is the unfolding timing: the links open first, then the dots turn into icons and the words fade in). */
+  .nav-glyph, .nav-dot { transform-box: view-box; transform-origin: 50% 50%; }
+  .nav-glyph { transition: opacity 0.2s ease 0.1s, scale 0.24s var(--ease) 0.1s; }
+  .nav-dot { opacity: 0; scale: 0.2; fill: color-mix(in oklab, var(--color-base-content) 85%, transparent); transition: opacity 0.1s ease, scale 0.12s ease; }
   .nav-link-label {
     max-width: 5rem;
     margin-left: 0.4rem;
     overflow: hidden;
-    transition: max-width 0.4s var(--ease), margin 0.4s var(--ease), opacity 0.25s ease;
+    transition: max-width 0.3s var(--ease) 0.08s, margin 0.3s var(--ease) 0.08s, opacity 0.22s ease 0.14s;
   }
 
   /* social links: three icons spread over the same width as Posts + Projects; they fold away completely while compact */
@@ -543,8 +549,18 @@ hr.slo-hr {
     --social-w: 0px;
   }
   .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-side { gap: 0; }
-  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-side--left .nav-link { width: 0; }
+  /* Folding, in order (about 0.45s in all, after a short pause so that grazing the edge of the pill does not make it
+     flutter): the words fade and the icons shrink into dots, then the links narrow and the dots slide together. */
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-side--left .nav-link {
+    width: 0.4375rem; /* the 3-dot icon's spacing: dots 7px apart */
+    pointer-events: none; /* taps and clicks go to the 3-dot button underneath */
+    background-color: transparent;
+    box-shadow: none;
+    transition: width 0.21s var(--ease) 0.11s, background-color 0.1s ease 0.05s, box-shadow 0.1s ease 0.05s, scale 0.25s;
+  }
   .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-about { width: var(--slot-sm); }
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-side--left { transition: gap 0.21s var(--ease) 0.11s; }
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-side--right { gap: 0; transition-delay: 0.08s; }
   .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-link-label,
   .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-about .nav-link-label {
     max-width: 0;
@@ -552,21 +568,21 @@ hr.slo-hr {
     padding-right: 0;
     opacity: 0;
   }
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-side--left .nav-link-label { transition: max-width 0.15s ease 0.05s, margin 0.15s ease 0.05s, opacity 0.09s ease 0.05s; }
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-glyph { opacity: 0; scale: 0.2; transition: opacity 0.09s ease 0.05s, scale 0.13s ease 0.05s; }
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-dot { opacity: 1; scale: 1; transition: opacity 0.1s ease 0.09s, scale 0.15s var(--ease) 0.09s; }
   .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-social { overflow: hidden; }
   .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-social-icons { opacity: 0; pointer-events: none; }
   .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-dots { opacity: 1; pointer-events: auto; }
   .nav-dots:hover { background: color-mix(in oklab, var(--color-base-content) 10%, transparent); }
-  /* a short pause before collapsing, so grazing the edge of the pill does not make it flutter */
-  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-link,
-  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-link-label,
-  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-side,
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-about,
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-about .nav-link-label,
   .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-social,
-  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-social-icons { transition-delay: 0.12s; }
-  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-dots { transition-delay: 0.4s, 0s; }
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-social-icons { transition-delay: 0.08s; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nav-panel, .nav-toc-panel, .nav-toc-btn, .nav-toc-chevron, .nav-tile, .nav-about-tile, .nav-panel-social, .nav-ham path, .nav-link, .nav-link-label, .nav-social, .nav-social-icons, .nav-side, .nav-dots { transition: none !important; }
+  .nav-panel, .nav-toc-panel, .nav-toc-btn, .nav-toc-chevron, .nav-tile, .nav-about-tile, .nav-panel-social, .nav-ham path, .nav-link, .nav-link-label, .nav-glyph, .nav-dot, .nav-social, .nav-social-icons, .nav-side, .nav-dots { transition: none !important; }
   .nav-link:hover, .nav-tile:hover, .nav-about-tile:hover, .nav-toggle:hover { scale: none; }
 }
 
@@ -1098,7 +1114,7 @@ hr.slo-hr {
   /* ... and up on the nav's row once the nav has folded down (it is then far too narrow to reach the ToC pill).
      The slide up waits for the nav to finish shrinking; the slide back down starts at once, so the expanding nav
      never runs into it. */
-  body[data-nav-collapsed] .toc-pill { --toc-top: 0.5rem; transition-delay: 0s, 0.25s; }
+  body[data-nav-collapsed] .toc-pill { --toc-top: 0.5rem; transition-delay: 0s, 0.17s; }
   @supports (corner-shape: squircle) {
     .toc-pill { corner-shape: superellipse(1.125); }
   }
@@ -1168,8 +1184,8 @@ hr.slo-hr {
   }
 
   /* collapsed: scrolled, and neither pinned, hovered nor keyboard-focused */
-  .toc-pill[data-scrolled]:not([data-pinned]):not([data-hover]):not(:has(:focus-visible)) .toc-panel { grid-template-rows: 0fr; transition-delay: 0.12s; }
-  .toc-pill[data-scrolled]:not([data-pinned]):not([data-hover]):not(:has(:focus-visible)) .toc-panel-inner { opacity: 0; }
+  .toc-pill[data-scrolled]:not([data-pinned]):not([data-hover]):not(:has(:focus-visible)) .toc-panel { grid-template-rows: 0fr; transition: grid-template-rows 0.3s var(--ease) 0.06s; }
+  .toc-pill[data-scrolled]:not([data-pinned]):not([data-hover]):not(:has(:focus-visible)) .toc-panel-inner { opacity: 0; transition-duration: 0.15s; }
   .toc-pill[data-scrolled]:not([data-pinned]):not([data-hover]):not(:has(:focus-visible)) .toc-bar-title { opacity: 0; }
   .toc-pill[data-scrolled]:not([data-pinned]):not([data-hover]):not(:has(:focus-visible)) .toc-ticks { opacity: 1; }
 }

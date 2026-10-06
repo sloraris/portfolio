@@ -62,7 +62,7 @@ const icons: Record<string, string> = {
                 class:list={['nav-link', 'nav-link--tone', item.id === activeId && 'is-active']}
                 aria-current={item.id === activeId ? 'page' : undefined}
               >
-                <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={icons[item.id] ?? icons.posts} />
+                <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={`<g class="nav-glyph">${icons[item.id] ?? icons.posts}</g><circle class="nav-dot" cx="12" cy="12" r="2.6" stroke="none"/>`} />
                 <span class="nav-link-label">{item.label}</span>
               </a>
             </li>
