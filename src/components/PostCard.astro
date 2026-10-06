@@ -1,0 +1,26 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate, postHref } from '../lib/site';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+}
+
+const { data } = Astro.props.post;
+---
+
+<a href={postHref(data.slug)} class="post-card block rounded-lg bg-base-100 w-full">
+  <div class="flex flex-col md:flex-row gap-4 p-4 items-start">
+    {data.cover && <img src={data.cover} alt="" loading="lazy" class="w-full md:w-52 rounded-lg aspect-video object-cover" />}
+    <div class="grow w-full">
+      <h2 class="text-xl font-bold">{data.title}</h2>
+      <p class="text-muted text-sm opacity-70">{formatDate(data.date)} · {data.readingTime} min read</p>
+      {data.description && <p class="py-1">{data.description}</p>}
+      {data.tags.length > 0 && (
+        <div class="flex flex-wrap gap-2 justify-end pt-1">
+          {data.tags.map((tag) => <span class="badge badge-outline">{tag}</span>)}
+        </div>
+      )}
+    </div>
+  </div>
+</a>

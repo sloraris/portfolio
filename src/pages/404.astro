@@ -1,0 +1,64 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="404: Not Found" layout="bare">
+  <div class="hyperspace-container">
+    <div class="star-field"></div>
+  </div>
+  <div class="content-wrapper">
+    <div class="text-center">
+      <h1 class="text-9xl font-bold mb-4">Uh Oh...</h1>
+      <h2 class="text-9xl font-bold mb-2">404</h2>
+      <h3 class="text-2xl mb-4">Looks like this page is lost in hyperspace.</h3>
+      <p class="text-xl mb-6">You tryna make the kessel run or something?</p>
+      <a class="btn btn-accent mt-4" href="/">Return to Known Space</a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .hyperspace-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .star-field {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: 1px;
+    width: 1px;
+    background-color: #fff;
+    border-radius: 50%;
+    box-shadow: -42vw -4vh 0px 0px #fff,25vw -41vh 0px 0px #fff,-20vw 49vh 0px 1px #fff,5vw 40vh 1px 1px #fff,29vw 19vh 1px 0px #fff,-44vw -13vh 0px 0px #fff,46vw 41vh 0px 1px #fff,-3vw -45vh 0px 1px #fff,47vw 35vh 1px 0px #fff,12vw -8vh 1px 0px #fff,-34vw 48vh 1px 1px #fff,32vw 26vh 1px 1px #fff,32vw -41vh 1px 1px #fff,0vw 37vh 1px 1px #fff,34vw -26vh 1px 0px #fff,-14vw -49vh 1px 0px #fff,-12vw 45vh 0px 1px #fff,-44vw -33vh 0px 1px #fff,-13vw 41vh 0px 0px #fff,-36vw -11vh 0px 1px #fff,-23vw -24vh 1px 0px #fff,-38vw -27vh 0px 1px #fff,16vw -19vh 0px 0px #fff,28vw 33vh 1px 0px #fff,-49vw -4vh 0px 0px #fff,16vw 32vh 0px 1px #fff,36vw -18vh 1px 0px #fff,-25vw -30vh 1px 0px #fff,-23vw 24vh 0px 1px #fff,-2vw -35vh 1px 1px #fff,-25vw 9vh 0px 0px #fff,-15vw -34vh 0px 0px #fff,-8vw -19vh 1px 0px #fff,-20vw -20vh 1px 1px #fff,42vw 50vh 0px 1px #fff,-32vw 10vh 1px 0px #fff,-23vw -17vh 0px 0px #fff,44vw 15vh 1px 0px #fff,-40vw 33vh 1px 1px #fff,-43vw 8vh 0px 0px #fff,-48vw -15vh 1px 1px #fff,-24vw 17vh 0px 0px #fff,-31vw 50vh 1px 0px #fff,36vw -38vh 0px 1px #fff,-7vw 48vh 0px 0px #fff,15vw -32vh 0px 0px #fff,29vw -41vh 0px 0px #fff,2vw 37vh 1px 0px #fff,7vw -40vh 1px 1px #fff,15vw 18vh 0px 0px #fff,25vw -13vh 1px 1px #fff,-46vw -12vh 1px 1px #fff,-18vw 22vh 0px 0px #fff,23vw -9vh 1px 0px #fff,50vw 12vh 0px 1px #fff,45vw 2vh 0px 0px #fff,
+      /* New stars start here */
+      -38vw -46vh 0px 0px #fff,22vw 38vh 1px 1px #fff,-11vw -22vh 1px 0px #fff,25vw 30vh 0px 1px #fff,15vw -49vh 0px 0px #fff,-26vw -32vh 1px 1px #fff,-32vw 41vh 1px 0px #fff,0vw -37vh 1px 1px #fff,43vw 28vh 0px 1px #fff,-9vw 9vh 1px 0px #fff,-17vw -23vh 1px 0px #fff,20vw -17vh 1px 1px #fff,-4vw -37vh 1px 1px #fff,-6vw -46vh 1px 1px #fff,38vw 34vh 1px 0px #fff,2vw -49vh 1px 0px #fff,16vw -43vh 0px 1px #fff,48vw 6vh 0px 0px #fff,-13vw 29vh 0px 1px #fff,-32vw 48vh 1px 1px #fff,32vw 4vh 1px 0px #fff,4vw -45vh 0px 1px #fff,41vw -13vh 1px 0px #fff,-36vw -38vh 0px 1px #fff,-33vw 9vh 1px 1px #fff,25vw -20vh 0px 0px #fff,-10vw -16vh 1px 1px #fff,7vw 28vh 0px 1px #fff,29vw -11vh 1px 0px #fff,-27vw 19vh 1px 0px #fff,33vw -50vh 1px 0px #fff,18vw 27vh 0px 1px #fff,-15vw -22vh 1px 1px #fff,-31vw 39vh 1px 0px #fff,40vw 45vh 0px 0px #fff,-38vw -10vh 0px 1px #fff,37vw 48vh 1px 0px #fff,43vw -23vh 0px 1px #fff,23vw -35vh 1px 1px #fff,-31vw -14vh 1px 0px #fff,48vw -38vh 1px 0px #fff,-24vw 47vh 0px 1px #fff,-38vw -30vh 1px 0px #fff,-19vw 37vh 0px 0px #fff,26vw 16vh 1px 1px #fff,8vw -13vh 1px 0px #fff,-24vw 1vh 1px 1px #fff,-30vw -25vh 0px 1px #fff,45vw 49vh 1px 0px #fff,11vw 8vh 0px 0px #fff,-19vw -13vh 0px 1px #fff,-41vw -35vh 1px 1px #fff,-13vw -49vh 1px 0px #fff,-36vw -49vh 0px 0px #fff,41vw 34vh 1px 1px #fff,-23vw 6vh 0px 0px #fff,-4vw -9vh 1px 0px #fff,38vw -51vh 1px 1px #fff,-16vw 4vh 0px 0px #fff,2vw 47vh 0px 0px #fff,36vw -29vh 1px 1px #fff,-42vw 24vh 0px 0px #fff,-7vw 5vh 0px 1px #fff,-34vw 24vh 1px 0px #fff,8vw -48vh 1px 1px #fff,18vw -30vh 0px 1px #fff,33vw -47vh 1px 1px #fff,24vw 6vh 0px 1px #fff,2vw -47vh 1px 0px #fff,47vw -48vh 1px 1px #fff,39vw -43vh 1px 1px #fff,-43vw -16vh 0px 1px #fff,21vw 46vh 0px 0px #fff,-15vw -28vh 1px 1px #fff,48vw 17vh 1px 0px #fff,-12vw 18vh 0px 0px #fff,-24vw 40vh 0px 1px #fff,29vw -4vh 1px 1px #fff,-9vw -13vh 1px 0px #fff,-39vw 48vh 0px 1px #fff,-42vw -35vh 0px 0px #fff,39vw -26vh 1px 1px #fff,40vw -12vh 1px 1px #fff,2vw 37vh 0px 0px #fff,32vw 38vh 0px 1px #fff,19vw -17vh 1px 1px #fff,14vw 17vh 0px 0px #fff,38vw 36vh 1px 0px #fff,-26vw -11vh 0px 0px #fff,17vw -38vh 1px 1px #fff,21vw 37vh 1px 0px #fff,40vw 9vh 0px 1px #fff,-20vw -4vh 1px 1px #fff,47vw 6vh 1px 0px #fff,-34vw 51vh 1px 1px #fff,51vw -48vh 1px 0px #fff,-38vw -31vh 1px 1px #fff,41vw -33vh 0px 0px #fff,7vw 28vh 1px 1px #fff;
+    animation: hyperspace 6s ease-in-out infinite;
+    transform-style: preserve-3d;
+  }
+
+  @keyframes hyperspace {
+    0%, 100% {
+      transform: perspective(500px) rotateZ(0deg) translateZ(0);
+    }
+    50% {
+      transform: perspective(500px) rotateZ(10deg) translateZ(300px);
+    }
+  }
+
+  .content-wrapper {
+    position: relative;
+    min-height: 80vh;
+    display: flex;
+    justify-content: ;
+    align-items: center;
+    z-index: 1;
+  }
+</style>

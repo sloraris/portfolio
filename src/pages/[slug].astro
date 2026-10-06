@@ -1,0 +1,51 @@
+---
+// Standalone pages (About, etc.): notes with `type: page`. They live at /<slug>/.
+import { getPages } from '../lib/content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AuthorBox from '../components/AuthorBox.astro';
+import { SITE } from '../config';
+
+export async function getStaticPaths() {
+  // (getStaticPaths runs on its own: it can use imports, but not variables declared outside it)
+  const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const pages = await getPages();
+  const paths = pages.map((page) => ({ params: { slug: page.data.slug }, props: { page } }));
+
+  // The nav always links to /about/. Until an About note (`type: page`, `slug: about`) is published in the
+  // vault, show a short placeholder built from the bio in src/config.ts. A published note replaces it.
+  if (!pages.some((p) => p.data.slug === 'about')) {
+    const { bio } = SITE.author;
+    paths.push({
+      params: { slug: 'about' },
+      props: {
+        page: {
+          data: {
+            slug: 'about',
+            title: 'About',
+            description: bio,
+            cover: undefined,
+            headings: [] as { depth: number; id: string; text: string }[],
+            html: `<p>${esc(bio)}</p><p>A fuller write-up is on its way.</p>`,
+          },
+        },
+      },
+    });
+  }
+  return paths;
+}
+
+const { data } = Astro.props.page;
+// No table of contents on standalone pages, only on posts and projects. To bring it back here, import TocRail and
+// pass `toc={data.headings}` to BaseLayout plus <TocRail> in its `aside` slot, the way posts/[slug].astro does.
+---
+
+<BaseLayout title={data.title} description={data.description} image={data.cover} layout="article">
+  <article class="min-w-0">
+    {data.cover && <img src={data.cover} alt="" class="w-full mb-6 rounded-xl aspect-video object-cover" />}
+    <h1 class="text-4xl font-bold my-2">{data.title}</h1>
+    <hr class="slo-static-hr my-4" />
+
+    <div class="post-prose prose prose-lg max-w-none" set:html={data.html} />
+    <AuthorBox />
+  </article>
+</BaseLayout>

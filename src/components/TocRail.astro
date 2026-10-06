@@ -1,0 +1,49 @@
+---
+import Toc from './Toc.astro';
+
+interface Props {
+  headings: { depth: number; id: string; text: string }[];
+}
+
+const headings = Astro.props.headings;
+const ticks = headings.filter((h) => h.depth <= 3);
+---
+
+<!--
+  Table-of-contents pill (1280px and up; below that the inline <details> list is used instead).
+  Fixed at the right edge. On wide windows it shares the nav pill's row; on narrower ones it sits just under the
+  nav pill (see global.css), so the two can never overlap.
+    open      (page top, hovered, keyboard-focused, or pinned with the button): the full list drops down
+    collapsed (scrolling, not pinned):                                         a slim bar of ticks + reading progress
+                                                                               (more headings than fit: a window of
+                                                                               ticks that slides along with you)
+-->
+<aside class="toc-pill" id="toc-pill" aria-label="Table of contents" data-ids={ticks.map((h) => h.id).join('|')}>
+  <button type="button" class="toc-bar" id="toc-bar" aria-pressed="false" aria-controls="toc-panel" title="Keep this list open">
+    <svg class="toc-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <path d="M4 6h16M4 12h10M4 18h13"></path>
+    </svg>
+    <span class="toc-bar-mid">
+      <span class="toc-bar-title font-display">On this page</span>
+      <span class="toc-ticks" aria-hidden="true">
+        <span class="toc-ticks-track">
+          {ticks.map((h) => <i class:list={['toc-tick', h.depth === 3 && 'is-sub']}></i>)}
+        </span>
+      </span>
+    </span>
+    <span class="toc-percent" aria-hidden="true">0%</span>
+    <svg class="toc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="m6 9 6 6 6-6"></path>
+    </svg>
+  </button>
+
+  <div class="toc-panel" id="toc-panel">
+    <div class="toc-panel-inner">
+      <Toc headings={headings} />
+    </div>
+  </div>
+</aside>
+
+<script>
+  import '../lib/tocPill.js';
+</script>

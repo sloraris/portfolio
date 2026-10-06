@@ -1,0 +1,178 @@
+---
+import { NAV, SITE } from '../config';
+import Logo from './Logo.astro';
+import SocialIcons from './SocialIcons.astro';
+import Toc from './Toc.astro';
+
+interface Props {
+  /** headings of the page's table of contents, when it has one: below xl it lives in this pill */
+  toc?: { depth: number; id: string; text: string }[];
+}
+const { toc } = Astro.props;
+const tocTicks = (toc ?? []).filter((h) => h.depth <= 3);
+
+// All four buttons are always shown. Projects and About land on a placeholder until
+// there is something published behind them.
+const path = Astro.url.pathname;
+// Exact match only: on a post page nothing is "active", so "Posts" stays clickable
+// (active items are deliberately not clickable, like on the old site).
+const activeId = NAV.find((n) => n.href === path || n.href === `${path}/`)?.id;
+
+// Wide screens: Home, Posts, Projects left of the logo; socials and About (avatar button) right of it.
+const left = NAV.filter((n) => n.id !== 'about');
+const about = NAV.find((n) => n.id === 'about') ?? { id: 'about', label: 'About', href: '/about/' };
+const { author } = SITE;
+
+// Home purple, Posts blue, Projects orange (the gradient's order). Used for the menu tiles below xl and for the
+// hover / current-page colour of the links on wide screens. About is outlined in the whole gradient instead.
+const tone: Record<string, string> = { home: 'purple', posts: 'blue', projects: 'orange' };
+
+// 24x24 stroke icons
+const icons: Record<string, string> = {
+  home: '<path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/>',
+  posts: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/>',
+  projects: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>',
+  about: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+};
+---
+
+<!--
+  Floating pill.
+  From 1280px up (xl, same breakpoint as the sidebars) it sits centered at the top:
+    expanded  (page top, page bottom, or hovered/focused/tapped): [Home][Posts][Projects]  logo  [social icons][About]
+    compact   (while scrolling):                                  [3 dots]  logo  [avatar]
+              The left buttons fold into the 3-dot button and the right side into the avatar. Hovering the pill
+              expands it (touch screens: tap the dots), so the dots are never a target that moves.
+  Below xl it sits at the bottom edge, in thumb reach. The menu button grows it upward into a panel of tiles, and on
+  pages with a table of contents the middle of the bar holds a ToC button (reading progress) that grows it upward
+  into the list instead.
+-->
+<header class="site-nav">
+  <nav class="nav-pill" id="nav-pill" aria-label="Main">
+    <div class="nav-bar">
+      <div class="nav-left">
+        <!-- only visible while compact. It is a touch affordance (tap = expand the pill); the links stay reachable
+             for keyboards and screen readers even while folded away, so it is hidden from both. -->
+        <button type="button" class="nav-dots" tabindex="-1" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <circle cx="5" cy="12" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="19" cy="12" r="1.9"></circle>
+          </svg>
+        </button>
+        <ul class="nav-side nav-side--left">
+          {left.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class:list={['nav-link', 'nav-link--tone', `nav-link--${tone[item.id] ?? 'blue'}`, item.id === activeId && 'is-active']}
+                aria-current={item.id === activeId ? 'page' : undefined}
+              >
+                <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={icons[item.id] ?? icons.posts} />
+                <span class="nav-link-label">{item.label}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <a href="/" class="nav-logo" aria-label="Home">
+        <Logo />
+      </a>
+
+      <div class="nav-side nav-side--right">
+        <div class="nav-social" role="group" aria-label="Social links">
+          <div class="nav-social-icons">
+            <SocialIcons />
+          </div>
+        </div>
+        <a
+          href={about.href}
+          class:list={['nav-link', 'nav-about', about.id === activeId && 'is-active']}
+          aria-current={about.id === activeId ? 'page' : undefined}
+        >
+          {author.avatar
+            ? <img src={author.avatar} alt="" width="36" height="36" decoding="async" class="nav-about-avatar" />
+            : <span class="nav-about-avatar nav-about-avatar--letter" aria-hidden="true">{author.name.charAt(0).toLowerCase()}</span>}
+          <span class="nav-link-label">{about.label}</span>
+        </a>
+      </div>
+
+      {tocTicks.length > 0 && (
+        <button type="button" class="nav-toc-btn" aria-expanded="false" aria-controls="nav-toc-panel" aria-label="On this page" data-ids={tocTicks.map((h) => h.id).join('|')}>
+          <svg class="nav-toc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M4 6h16M4 12h10M4 18h13"></path>
+          </svg>
+          <span class="toc-ticks nav-toc-ticks" aria-hidden="true">
+            <span class="toc-ticks-track">
+              {tocTicks.map((h) => <i class:list={['toc-tick', h.depth === 3 && 'is-sub']}></i>)}
+            </span>
+          </span>
+          <span class="toc-percent nav-toc-percent" aria-hidden="true">0%</span>
+          <svg class="nav-toc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m6 15 6-6 6 6"></path>
+          </svg>
+        </button>
+      )}
+
+      <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="nav-panel" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" class="nav-ham" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M4 6h16"></path>
+          <path d="M4 12h16"></path>
+          <path d="M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+
+    {tocTicks.length > 0 && (
+      <div class="nav-toc-panel" id="nav-toc-panel">
+        <div class="nav-toc-inner">
+          <div class="nav-toc-list">
+            <p class="font-display font-bold mb-1">On this page</p>
+            <Toc headings={toc ?? []} />
+          </div>
+        </div>
+      </div>
+    )}
+
+    <div class="nav-panel" id="nav-panel">
+      <div class="nav-panel-inner">
+        <ul class="nav-tiles">
+          {left.map((item, i) => (
+            <li style={`--i:${i}`}>
+              <a
+                href={item.href}
+                class:list={['nav-tile', `nav-tile--${tone[item.id] ?? 'blue'}`, item.id === activeId && 'is-active']}
+                aria-current={item.id === activeId ? 'page' : undefined}
+              >
+                <span class="nav-tile-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={icons[item.id] ?? icons.posts} />
+                </span>
+                <span class="nav-tile-label">{item.label}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a
+          href={about.href}
+          class:list={['nav-about-tile', about.id === activeId && 'is-active']}
+          style={`--i:${left.length}`}
+          aria-current={about.id === activeId ? 'page' : undefined}
+        >
+          {author.avatar
+            ? <img src={author.avatar} alt="" width="36" height="36" decoding="async" class="nav-about-tile-avatar" />
+            : <span class="nav-about-tile-avatar nav-about-tile-avatar--letter" aria-hidden="true">{author.name.charAt(0).toLowerCase()}</span>}
+          <span class="nav-about-tile-label">{about.label}</span>
+        </a>
+        <div class="nav-panel-social" style={`--i:${left.length + 1}`}>
+          <hr class="nav-divider" />
+          <div class="flex justify-center gap-1">
+            <SocialIcons />
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<script>
+  import '../lib/mobileMenu.js';
+</script>

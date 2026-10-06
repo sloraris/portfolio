@@ -1,0 +1,43 @@
+# Copy this file into your CONTENT repo as .github/workflows/notify-site.yml
+#
+# When you push notes (Obsidian Git -> "commit and sync"), this tells the site repo
+# to rebuild. Pushing to the content repo does not rebuild anything by itself.
+#
+# Setup in the CONTENT repo (Settings -> Secrets and variables -> Actions):
+#   variable  SITE_REPO            e.g. sloraris/portfolio
+#   secret    SITE_DISPATCH_TOKEN  fine-grained token limited to the SITE repo,
+#                                  permission "Contents: Read and write"
+#                                  (that is what GitHub requires to send a dispatch event)
+
+name: Notify site
+
+on:
+  push:
+    branches: [main]
+    # Obsidian rewrites its own settings and window layout all the time; that is not a content change.
+    paths-ignore:
+      - '.obsidian/**'
+      - '.trash/**'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger a site rebuild
+        env:
+          SITE_REPO: ${{ vars.SITE_REPO }}
+          TOKEN: ${{ secrets.SITE_DISPATCH_TOKEN }}
+        run: |
+          if [ -z "$SITE_REPO" ] || [ -z "$TOKEN" ]; then
+            echo "::error title=Site repo not configured::Set the variable SITE_REPO and the secret SITE_DISPATCH_TOKEN (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+          curl --fail-with-body -sS -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$SITE_REPO/dispatches" \
+            -d '{"event_type":"content-updated"}'

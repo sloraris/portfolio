@@ -1,0 +1,26 @@
+---
+import { getPosts } from '../../lib/content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { tagSlug } from '../../lib/site';
+
+const posts = await getPosts();
+const tags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
+---
+
+<BaseLayout title="Posts" description="Everything I've written up so far.">
+  <h1 class="text-4xl font-bold mb-2">Posts</h1>
+  <hr class="slo-static-hr" />
+
+  {tags.length > 0 && (
+    <div class="flex flex-wrap gap-2 my-4">
+      {tags.map((tag) => (
+        <a href={`/posts/tag/${tagSlug(tag)}/`} class="badge badge-outline hover:badge-primary">{tag}</a>
+      ))}
+    </div>
+  )}
+
+  {posts.length > 0
+    ? <div class="grid grid-cols-1 gap-4 mt-4">{posts.map((post) => <PostCard post={post} />)}</div>
+    : <p class="opacity-70 mt-4">Nothing published yet.</p>}
+</BaseLayout>

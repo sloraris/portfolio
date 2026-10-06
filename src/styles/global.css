@@ -1,0 +1,1022 @@
+@import "tailwindcss";
+@import "@fontsource-variable/exo-2";
+@import "@fontsource/ubuntu/400.css";
+@import "@fontsource/ubuntu/400-italic.css";
+@import "@fontsource/ubuntu/500.css";
+@import "@fontsource/ubuntu/700.css";
+@import "@fontsource/ubuntu-mono/400.css";
+@import "@fontsource/ubuntu-mono/700.css";
+
+@plugin "@tailwindcss/typography";
+@plugin "daisyui" {
+  themes: false;
+}
+
+/* The sloraris palette, carried over from the original site's DaisyUI theme. */
+@plugin "daisyui/theme" {
+  name: "sloraris";
+  default: true;
+  prefersdark: true;
+  color-scheme: dark;
+
+  --color-base-100: #1f2937;
+  --color-base-200: #101721;
+  --color-base-300: #090f16;
+  --color-base-content: #e5e9f0;
+
+  --color-primary: #fc8236;
+  --color-primary-content: #1a0d03;
+  --color-secondary: #60a5fa;
+  --color-secondary-content: #04121f;
+  --color-accent: #6f0fc2;
+  --color-accent-content: #f6ecff;
+  --color-neutral: #e7eff9;
+  --color-neutral-content: #1f2937;
+
+  --color-info: #9ca3af;
+  --color-info-content: #111827;
+  --color-success: #4ade80;
+  --color-success-content: #052e16;
+  --color-warning: #facc15;
+  --color-warning-content: #2b2200;
+  --color-error: #ef4444;
+  --color-error-content: #2a0606;
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.75rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@theme {
+  --font-sans: "Ubuntu", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Exo 2 Variable", "Ubuntu", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Ubuntu Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/*------------------- Base -------------------*/
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+}
+
+h1, h2, h3, h4, h5, h6, a, .btn {
+  font-family: var(--font-display);
+}
+
+/*------------------- Gradient dividers & hovers (from the old site) -------------------*/
+.slo-bg-gradient {
+  background-image: linear-gradient(
+    45deg,
+    var(--color-accent), var(--color-accent), var(--color-secondary),
+    var(--color-primary), var(--color-primary)
+  );
+}
+
+hr.slo-static-hr {
+  height: 2px;
+  border: 0;
+  margin: 0.5rem 0;
+  border-radius: 9999px;
+  background-image: linear-gradient(
+    45deg,
+    var(--color-accent), var(--color-accent), var(--color-secondary),
+    var(--color-primary), var(--color-primary)
+  );
+}
+
+hr.slo-hr {
+  height: 0.5rem;
+  border: 0;
+  margin: 2.5rem 0;
+  border-radius: 9999px;
+}
+
+.slo-bg-animated-static,
+hr.slo-hr {
+  animation: animatedGradient 8s ease infinite alternate;
+  background-image: linear-gradient(
+    45deg,
+    var(--color-accent), var(--color-primary), var(--color-secondary),
+    var(--color-accent), var(--color-primary), var(--color-accent)
+  );
+  background-size: 300% 300%;
+}
+
+.slo-bg-animated:hover {
+  animation: animatedGradient 4s ease infinite alternate;
+  background-image: linear-gradient(
+    45deg,
+    var(--color-accent), var(--color-primary), var(--color-secondary),
+    var(--color-accent), var(--color-primary), var(--color-accent)
+  );
+  background-size: 300% 300%;
+}
+
+@keyframes animatedGradient {
+  0%   { background-position: 0 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+.post-card {
+  transition: ease-in-out 0.2s;
+}
+.post-card:hover {
+  background-color: var(--color-neutral);
+  color: var(--color-neutral-content);
+  scale: 1.01;
+  box-shadow: 0 0 15px 0 var(--color-secondary);
+}
+.post-card:hover .text-muted {
+  color: inherit;
+  opacity: 0.8;
+}
+
+/*------------------- Nav: floating pill -------------------*/
+/* Below xl: a pill at the bottom edge (thumb reach) that grows upward into a panel of tiles.
+   From xl (same breakpoint as the sidebars): centered at the top with the links inline. */
+.site-nav { height: 0; }
+
+.nav-pill {
+  position: fixed;
+  z-index: 40;
+  left: 1rem;
+  right: 1rem;
+  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  max-width: 28rem;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column; /* bar first in the DOM, but the panel opens above it */
+  overflow: hidden;
+  border-radius: 1.5rem;
+  border: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+  background: color-mix(in oklab, var(--color-base-200) 88%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.45);
+}
+@supports (corner-shape: squircle) {
+  .nav-pill { corner-shape: superellipse(1.125); }
+}
+
+.nav-bar {
+  order: 2; /* below the panel */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  height: 3.25rem;
+  padding: 0 0.5rem 0 1.1rem;
+}
+.nav-logo { display: flex; align-items: center; flex: none; }
+.nav-logo img { height: 1.75rem; width: auto; }
+.nav-side, .nav-left { display: none; }
+
+/* menu button: three bars that fold into a cross while open */
+.nav-toggle {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background-color 0.15s, scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.nav-toggle:hover { background: color-mix(in oklab, var(--color-base-content) 10%, transparent); scale: 1.08; }
+.nav-toggle:focus-visible { outline: 2px solid var(--color-secondary); outline-offset: 2px; }
+.nav-ham { width: 1.5rem; height: 1.5rem; }
+.nav-ham path {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.25s ease, opacity 0.2s ease;
+}
+.nav-pill[data-open] .nav-ham path:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav-pill[data-open] .nav-ham path:nth-child(2) { opacity: 0; }
+.nav-pill[data-open] .nav-ham path:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* expanding panel: the grid row animates from 0fr to 1fr, so the height needs no measuring */
+.nav-panel {
+  order: 1;
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition: grid-template-rows 0.38s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.38s;
+}
+.nav-pill[data-open] .nav-panel {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.nav-panel-inner { min-height: 0; overflow: hidden; }
+
+/* ToC button: the middle of the bar, on pages with a table of contents (reading progress; tap to open the list) */
+.nav-toc-btn {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 12rem;
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 2.25rem;
+  padding: 0 0.6rem 0 0.7rem;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in oklab, var(--color-primary) 38%, transparent);
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s, scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.nav-toc-btn:active { scale: 0.96; }
+.nav-toc-btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.nav-toc-icon { flex: none; width: 1.05rem; height: 1.05rem; color: var(--color-primary); }
+.nav-toc-ticks { flex: 1; min-width: 0; height: 1.5rem; }
+.nav-toc-percent { min-width: 1.9rem; }
+.nav-toc-chevron {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  color: color-mix(in oklab, var(--color-base-content) 75%, transparent);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.nav-pill[data-toc-open] .nav-toc-btn {
+  background: color-mix(in oklab, var(--color-primary) 16%, transparent);
+  border-color: color-mix(in oklab, var(--color-primary) 70%, transparent);
+}
+.nav-pill[data-toc-open] .nav-toc-chevron { transform: rotate(180deg); }
+
+/* the list opens upward like the menu panel (they are never open together) */
+.nav-toc-panel {
+  order: 1;
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition: grid-template-rows 0.38s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.38s;
+}
+.nav-pill[data-toc-open] .nav-toc-panel {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.nav-toc-inner { min-height: 0; overflow-y: auto; overscroll-behavior: contain; max-height: min(55dvh, 26rem); }
+.nav-toc-list {
+  padding: 0.9rem 1rem 0.75rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+}
+.nav-toc-list .toc a { padding-block: 0.35rem; }
+
+.nav-tiles {
+  list-style: none;
+  margin: 0;
+  padding: 0.75rem 0.75rem 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* Home | Posts | Projects */
+  gap: 0.5rem;
+}
+
+.nav-tile {
+  --tone: var(--color-secondary);
+  --tone-ink: var(--color-secondary-content);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 0.25rem 0.8rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in oklab, var(--tone) 30%, transparent);
+  background: color-mix(in oklab, var(--tone) 14%, var(--color-base-300));
+  text-decoration: none;
+  /* hidden until the panel opens, then each tile rises in turn */
+  opacity: 0;
+  transform: translateY(0.75rem) scale(0.96);
+  transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.15s, border-color 0.15s, scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.nav-tile--blue { --tone: var(--color-secondary); --tone-ink: var(--color-secondary-content); }
+.nav-tile--orange { --tone: var(--color-primary); --tone-ink: var(--color-primary-content); }
+.nav-tile--purple { --tone: var(--color-accent); --tone-ink: var(--color-accent-content); }
+.nav-pill[data-open] .nav-tile {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.15s, border-color 0.15s, scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-delay: calc(70ms + var(--i, 0) * 50ms), calc(70ms + var(--i, 0) * 50ms), 0s, 0s, 0s;
+}
+.nav-tile:hover { background: color-mix(in oklab, var(--tone) 26%, var(--color-base-300)); scale: 1.05; }
+.nav-tile.is-active { pointer-events: none; border-color: var(--tone); background: color-mix(in oklab, var(--tone) 26%, var(--color-base-300)); }
+.nav-tile:focus-visible { outline: 2px solid var(--tone); outline-offset: 2px; }
+.nav-tile-icon {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background: var(--tone);
+  color: var(--tone-ink);
+}
+.nav-tile-icon svg { width: 1.3rem; height: 1.3rem; }
+.nav-tile-label { font-family: var(--font-display); font-weight: 600; font-size: 0.9rem; }
+
+/* About: a full-width bar, half the height of the tiles, outlined in the site gradient, avatar as its icon */
+.nav-about-tile {
+  --edge: linear-gradient(45deg, var(--color-accent), var(--color-secondary), var(--color-primary));
+  --fill: var(--color-base-300);
+  display: flex;
+  align-items: center;
+  margin: 0.5rem 0.75rem 0;
+  padding: 0.2rem;
+  border: 2px solid transparent;
+  border-radius: 9999px;
+  background: linear-gradient(var(--fill), var(--fill)) padding-box, var(--edge) border-box;
+  text-decoration: none;
+  opacity: 0;
+  transform: translateY(0.75rem) scale(0.98);
+  transition: opacity 0.2s ease, transform 0.2s ease, background 0.15s, scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.nav-pill[data-open] .nav-about-tile {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.15s, scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-delay: calc(70ms + var(--i, 0) * 50ms), calc(70ms + var(--i, 0) * 50ms), 0s, 0s;
+}
+.nav-about-tile:hover { --fill: color-mix(in oklab, var(--color-base-300) 82%, white); scale: 1.03; }
+.nav-about-tile.is-active { --fill: color-mix(in oklab, var(--color-accent) 24%, var(--color-base-300)); pointer-events: none; }
+.nav-about-tile:focus-visible { outline: 2px solid var(--color-secondary); outline-offset: 2px; }
+.nav-about-tile-avatar {
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  object-fit: cover;
+}
+.nav-about-tile-avatar--letter {
+  display: grid;
+  place-items: center;
+  background-image: linear-gradient(45deg, var(--color-accent), var(--color-secondary), var(--color-primary));
+  color: var(--color-base-300);
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+/* the right margin matches the avatar, so the word sits in the middle of the bar */
+.nav-about-tile-label { flex: 1; margin-right: 2.25rem; text-align: center; font-family: var(--font-display); font-weight: 600; font-size: 0.95rem; }
+
+.nav-panel-social {
+  padding: 0.75rem 0.75rem 0.5rem;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+/* dim grey line between the cards and the social links */
+.nav-divider {
+  height: 1px;
+  margin: 0 0 0.5rem;
+  border: 0;
+  background: color-mix(in oklab, var(--color-base-content) 22%, transparent);
+}
+.nav-pill[data-open] .nav-panel-social {
+  opacity: 1;
+  transition: opacity 0.3s ease calc(70ms + var(--i, 0) * 50ms);
+}
+
+/* room for the bottom pill below the last bit of content */
+@media (max-width: 79.999rem) {
+  .nav-bottom-space { padding-bottom: 6rem; }
+}
+
+@media (min-width: 80rem) {
+  .site-nav { height: var(--nav-h); }
+
+  .nav-pill {
+    /* Every text button is --slot wide whatever its label, so the two halves of the pill mirror each other:
+       3 slots left of the logo (Home, Posts, Projects), 3 on the right (social icons = 2, About = 1). */
+    --btn-h: 2.25rem;
+    --slot: 7rem;
+    --slot-sm: 2.25rem; /* the same buttons, icon only, while compact */
+    --gap: 0.25rem;
+    --social-full: calc(2 * var(--slot) + var(--gap));
+    --social-w: var(--social-full);
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    top: 0.5rem;
+    bottom: auto;
+    left: 0;
+    right: 0;
+    width: fit-content;
+    max-width: none;
+    flex-direction: row;
+    overflow: visible; /* so the social hover glow is not clipped */
+  }
+  .nav-bar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr; /* equal sides keep the logo dead center */
+    column-gap: 1.25rem;
+    height: 3rem;
+    padding: 0 0.375rem;
+  }
+  .nav-logo img { height: 2rem; }
+  .nav-toggle, .nav-panel, .nav-toc-btn, .nav-toc-panel { display: none; }
+
+  .nav-side { display: flex; align-items: center; gap: var(--gap); list-style: none; margin: 0; padding: 0; transition: gap 0.4s var(--ease); }
+  .nav-side--right { justify-self: end; }
+
+  /* left half: the three links, plus the 3-dot button that stands in for them while compact (it sits underneath
+     the links, so it is only ever reachable once they have folded to zero width) */
+  .nav-left { position: relative; display: flex; align-items: center; min-width: var(--slot-sm); }
+  .nav-dots {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    translate: 0 -50%;
+    display: grid;
+    place-items: center;
+    width: var(--slot-sm);
+    height: var(--btn-h);
+    border-radius: 9999px;
+    color: color-mix(in oklab, var(--color-base-content) 85%, transparent);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, background-color 0.15s;
+  }
+  .nav-dots svg { width: 1.5rem; height: 1.5rem; }
+
+  .nav-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--slot);
+    height: var(--btn-h);
+    overflow: hidden;
+    white-space: nowrap;
+    border-radius: 9999px;
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: width 0.4s var(--ease), background-color 0.15s, box-shadow 0.15s, scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .nav-link:hover { scale: 1.05; }
+  /* Home / Posts / Projects take the same colours as the menu tiles on small screens: purple, blue, orange.
+     Hovered: that colour as a tint; current page: the tint plus a ring in the colour (not clickable). */
+  .nav-link--purple { --tone: var(--color-accent); }
+  .nav-link--blue { --tone: var(--color-secondary); }
+  .nav-link--orange { --tone: var(--color-primary); }
+  .nav-link--tone:hover { background-color: color-mix(in oklab, var(--tone) 26%, transparent); }
+  .nav-link--tone.is-active {
+    pointer-events: none;
+    background-color: color-mix(in oklab, var(--tone) 26%, transparent);
+    box-shadow: inset 0 0 0 2px var(--tone);
+  }
+  .nav-link--tone:focus-visible { outline: 2px solid var(--tone); outline-offset: 2px; }
+  .nav-link-icon { flex: none; width: 1.1rem; height: 1.1rem; }
+  .nav-link-label {
+    max-width: 5rem;
+    margin-left: 0.4rem;
+    overflow: hidden;
+    transition: max-width 0.4s var(--ease), margin 0.4s var(--ease), opacity 0.25s ease;
+  }
+
+  /* social links: three icons spread over the same width as Posts + Projects; they fold away completely while compact */
+  .nav-social {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: var(--social-w);
+    height: var(--btn-h);
+    transition: width 0.4s var(--ease);
+  }
+  .nav-social-icons {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: var(--social-full); /* fixed, so folding the group away clips it instead of squeezing the icons */
+    flex: none;
+    transition: opacity 0.25s ease;
+  }
+  /* About: the avatar is the left end of the button, which is outlined in the site gradient (like the About bar in
+     the small-screen menu); compact, it is just the avatar inside the ring. Hovered it lightens, current page it
+     takes a purple tint. */
+  .nav-about {
+    --edge: linear-gradient(45deg, var(--color-accent), var(--color-secondary), var(--color-primary));
+    --fill: var(--color-base-200);
+    justify-content: flex-start;
+    border: 2px solid transparent;
+    background: linear-gradient(var(--fill), var(--fill)) padding-box, var(--edge) border-box;
+  }
+  .nav-about:hover { --fill: color-mix(in oklab, var(--color-base-200) 82%, white); }
+  .nav-about.is-active { --fill: color-mix(in oklab, var(--color-accent) 24%, var(--color-base-200)); pointer-events: none; }
+  .nav-about:focus-visible { outline: 2px solid var(--color-secondary); outline-offset: 2px; }
+  .nav-about-avatar {
+    flex: none;
+    width: calc(var(--btn-h) - 4px); /* the button's height minus its 2px border: the avatar is the button's left end */
+    height: calc(var(--btn-h) - 4px);
+    border-radius: 9999px;
+    object-fit: cover;
+  }
+  .nav-about-avatar--letter {
+    display: grid;
+    place-items: center;
+    background-image: linear-gradient(45deg, var(--color-accent), var(--color-secondary), var(--color-primary));
+    color: var(--color-base-300);
+    font-family: var(--font-display);
+    font-weight: 700;
+  }
+  .nav-about .nav-link-label {
+    flex: 1;
+    min-width: 0;
+    max-width: calc(var(--slot) - var(--btn-h));
+    margin-left: 0;
+    padding-right: 0.5rem;
+    text-align: center;
+  }
+
+  /* compact: while scrolling, unless the pill is hovered (JS: data-expanded), tapped open, or keyboard-focused.
+     The left links fold into the 3-dot button and the right side into the avatar. */
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) {
+    --social-w: 0px;
+  }
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-side { gap: 0; }
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-side--left .nav-link { width: 0; }
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-about { width: var(--slot-sm); }
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-link-label,
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-about .nav-link-label {
+    max-width: 0;
+    margin-left: 0;
+    padding-right: 0;
+    opacity: 0;
+  }
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-social { overflow: hidden; }
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-social-icons { opacity: 0; pointer-events: none; }
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-dots { opacity: 1; pointer-events: auto; }
+  .nav-dots:hover { background: color-mix(in oklab, var(--color-base-content) 10%, transparent); }
+  /* a short pause before collapsing, so grazing the edge of the pill does not make it flutter */
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-link,
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-link-label,
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-side,
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-social,
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-social-icons { transition-delay: 0.12s; }
+  .nav-pill[data-compact]:not([data-expanded]):not(:has(:focus-visible)) .nav-dots { transition-delay: 0.4s, 0s; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-panel, .nav-toc-panel, .nav-toc-btn, .nav-toc-chevron, .nav-tile, .nav-about-tile, .nav-panel-social, .nav-ham path, .nav-link, .nav-link-label, .nav-social, .nav-social-icons, .nav-side, .nav-dots { transition: none !important; }
+  .nav-link:hover, .nav-tile:hover, .nav-about-tile:hover, .nav-toggle:hover { scale: none; }
+}
+
+/*------------------- Social links: hover -------------------*/
+/* Each icon takes one of the gradient's colours (purple -> blue -> orange, in the order they appear). */
+.social-link {
+  --c: var(--color-base-content);
+  transition: scale 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease, background-color 0.2s ease, box-shadow 0.25s ease;
+}
+.social-link--github { --c: color-mix(in oklab, var(--color-accent) 45%, white); }
+.social-link--linkedin { --c: var(--color-secondary); }
+.social-link--rss { --c: var(--color-primary); }
+.social-link:hover,
+.social-link:focus-visible {
+  color: var(--c);
+  background-color: color-mix(in oklab, var(--c) 16%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--c) 40%, transparent), 0 0 14px color-mix(in oklab, var(--c) 32%, transparent);
+  scale: 1.14; /* grows around its own centre, so it stays put in the pill */
+}
+.social-link:active { scale: 0.94; transition-duration: 0.1s; }
+@media (prefers-reduced-motion: reduce) {
+  .social-link:hover, .social-link:focus-visible { scale: none; }
+}
+
+/*------------------- Home hero -------------------*/
+.cosmic {
+  background:
+    radial-gradient(1.5px 1.5px at 12% 22%, #fff, transparent),
+    radial-gradient(1px 1px at 28% 68%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 41% 18%, #fff9, transparent),
+    radial-gradient(1px 1px at 57% 80%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 73% 30%, #fff, transparent),
+    radial-gradient(1px 1px at 88% 62%, #fff9, transparent),
+    radial-gradient(1px 1px at 93% 12%, #fff, transparent),
+    radial-gradient(circle at 18% 25%, color-mix(in oklab, var(--color-accent) 55%, transparent), transparent 55%),
+    radial-gradient(circle at 85% 80%, color-mix(in oklab, var(--color-secondary) 35%, transparent), transparent 50%),
+    radial-gradient(circle at 60% 10%, color-mix(in oklab, var(--color-primary) 22%, transparent), transparent 45%),
+    var(--color-base-300);
+}
+
+/*------------------- Post content -------------------*/
+.post-prose {
+  --tw-prose-body: var(--color-base-content);
+  --tw-prose-headings: #fff;
+  --tw-prose-lead: var(--color-base-content);
+  --tw-prose-links: var(--color-secondary);
+  --tw-prose-bold: #fff;
+  --tw-prose-counters: var(--color-primary);
+  --tw-prose-bullets: var(--color-primary);
+  --tw-prose-hr: color-mix(in oklab, var(--color-base-content) 20%, transparent);
+  --tw-prose-quotes: var(--color-base-content);
+  --tw-prose-quote-borders: var(--color-primary);
+  --tw-prose-captions: var(--color-info);
+  --tw-prose-code: var(--color-base-content);
+  --tw-prose-pre-code: inherit;
+  --tw-prose-pre-bg: var(--color-base-200);
+  --tw-prose-th-borders: color-mix(in oklab, var(--color-base-content) 30%, transparent);
+  --tw-prose-td-borders: color-mix(in oklab, var(--color-base-content) 15%, transparent);
+}
+
+.post-prose h1, .post-prose h2, .post-prose h3, .post-prose h4 {
+  font-family: var(--font-display);
+}
+.post-prose a { text-underline-offset: 3px; }
+.post-prose img, .post-prose video { border-radius: var(--radius-box); margin-inline: auto; }
+.post-prose table { display: block; overflow-x: auto; }
+.post-prose mark {
+  background: color-mix(in oklab, var(--color-primary) 35%, transparent);
+  color: inherit;
+  padding: 0.05em 0.25em;
+  border-radius: 0.25em;
+}
+
+/* inline code (the old site gave it a base-300 chip) */
+.post-prose :not(pre) > code {
+  font-family: "Ubuntu Mono", ui-monospace, monospace;
+  background-color: var(--color-base-300);
+  padding: 0.15em 0.4em;
+  border-radius: 0.3em;
+  font-size: 0.95em;
+}
+.post-prose code::before, .post-prose code::after { content: none; }
+
+/* shiki code blocks */
+.post-prose pre.shiki {
+  background-color: var(--color-base-200) !important;
+  border: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+  border-radius: var(--radius-box);
+  font-family: "Ubuntu Mono", ui-monospace, monospace;
+  font-size: 0.95rem;
+}
+
+/* YouTube embeds */
+.post-prose .video-embed {
+  aspect-ratio: 16 / 9;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-box);
+  overflow: hidden;
+  background: var(--color-base-300);
+}
+.post-prose .video-embed iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+/* Obsidian callouts.
+   Icons are Lucide (the set Obsidian uses), drawn as a CSS mask so they take the callout's color (--c).
+   A type without its own icon below, or an unknown one, gets the note pencil, like Obsidian. */
+.post-prose {
+  --icon-pencil: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z'/%3E %3Cpath d='m15 5 4 4'/%3E%3C/svg%3E");
+  --icon-clipboard-list: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='8' height='4' x='8' y='2' rx='1' ry='1'/%3E %3Cpath d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'/%3E %3Cpath d='M12 11h4'/%3E %3Cpath d='M12 16h4'/%3E %3Cpath d='M8 11h.01'/%3E %3Cpath d='M8 16h.01'/%3E%3C/svg%3E");
+  --icon-info: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E %3Cpath d='M12 16v-4'/%3E %3Cpath d='M12 8h.01'/%3E%3C/svg%3E");
+  --icon-circle-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E %3Cpath d='m16 9-5.5 5.5L8 12'/%3E%3C/svg%3E");
+  --icon-flame: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4'/%3E%3C/svg%3E");
+  --icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+  --icon-circle-help: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E %3Cpath d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'/%3E %3Cpath d='M12 17h.01'/%3E%3C/svg%3E");
+  --icon-triangle-alert: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3'/%3E %3Cpath d='M12 9v4'/%3E %3Cpath d='M12 17h.01'/%3E%3C/svg%3E");
+  --icon-x: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E %3Cpath d='m6 6 12 12'/%3E%3C/svg%3E");
+  --icon-zap: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z'/%3E%3C/svg%3E");
+  --icon-bug: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20v-9'/%3E %3Cpath d='M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z'/%3E %3Cpath d='M14.12 3.88 16 2'/%3E %3Cpath d='M21 21a4 4 0 0 0-3.81-4'/%3E %3Cpath d='M21 5a4 4 0 0 1-3.55 3.97'/%3E %3Cpath d='M22 13h-4'/%3E %3Cpath d='M3 21a4 4 0 0 1 3.81-4'/%3E %3Cpath d='M3 5a4 4 0 0 0 3.55 3.97'/%3E %3Cpath d='M6 13H2'/%3E %3Cpath d='m8 2 1.88 1.88'/%3E %3Cpath d='M9 7.13V6a3 3 0 1 1 6 0v1.13'/%3E%3C/svg%3E");
+  --icon-list: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 5h.01'/%3E %3Cpath d='M3 12h.01'/%3E %3Cpath d='M3 19h.01'/%3E %3Cpath d='M8 5h13'/%3E %3Cpath d='M8 12h13'/%3E %3Cpath d='M8 19h13'/%3E%3C/svg%3E");
+  --icon-quote: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z'/%3E %3Cpath d='M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z'/%3E%3C/svg%3E");
+  --icon-chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+.post-prose .callout {
+  --c: var(--color-secondary);
+  --callout-icon: var(--icon-pencil);
+  margin: 1.5rem 0;
+  border-left: 4px solid var(--c);
+  border-radius: var(--radius-box);
+  background: color-mix(in oklab, var(--c) 12%, var(--color-base-200));
+  overflow: hidden;
+}
+.post-prose .callout-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  padding: 0.6rem 1rem;
+  color: var(--c);
+  background: color-mix(in oklab, var(--c) 14%, transparent);
+  cursor: default;
+}
+.post-prose .callout-title::before,
+.post-prose summary.callout-title::after {
+  content: "";
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  background-color: currentColor;
+  -webkit-mask: var(--callout-icon) center / contain no-repeat;
+  mask: var(--callout-icon) center / contain no-repeat;
+}
+
+/* Foldable callouts (> [!tip]- / [!tip]+): a chevron on the right instead of the browser's triangle */
+.post-prose summary.callout-title { cursor: pointer; list-style: none; }
+.post-prose summary.callout-title::-webkit-details-marker { display: none; }
+.post-prose summary.callout-title::after {
+  margin-left: auto;
+  width: 1.1rem;
+  height: 1.1rem;
+  -webkit-mask-image: var(--icon-chevron-down);
+  mask-image: var(--icon-chevron-down);
+  transform: rotate(-90deg);
+  transition: transform 0.15s ease;
+}
+.post-prose details.callout[open] > summary.callout-title::after { transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .post-prose summary.callout-title::after { transition: none; }
+}
+
+.post-prose .callout-content { padding: 0.25rem 1rem; }
+.post-prose .callout-content > :first-child { margin-top: 0.5rem; }
+.post-prose .callout-content > :last-child { margin-bottom: 0.5rem; }
+.post-prose .callout-content:empty { display: none; }
+
+/* icons per type */
+.post-prose .callout[data-callout="abstract"],
+.post-prose .callout[data-callout="summary"],
+.post-prose .callout[data-callout="tldr"] { --callout-icon: var(--icon-clipboard-list); }
+
+.post-prose .callout[data-callout="info"] { --callout-icon: var(--icon-info); }
+
+.post-prose .callout[data-callout="todo"] { --callout-icon: var(--icon-circle-check); }
+
+.post-prose .callout[data-callout="tip"],
+.post-prose .callout[data-callout="hint"],
+.post-prose .callout[data-callout="important"] { --callout-icon: var(--icon-flame); }
+
+.post-prose .callout[data-callout="success"],
+.post-prose .callout[data-callout="check"],
+.post-prose .callout[data-callout="done"] { --callout-icon: var(--icon-check); }
+
+.post-prose .callout[data-callout="question"],
+.post-prose .callout[data-callout="help"],
+.post-prose .callout[data-callout="faq"] { --callout-icon: var(--icon-circle-help); }
+
+.post-prose .callout[data-callout="warning"],
+.post-prose .callout[data-callout="caution"],
+.post-prose .callout[data-callout="attention"] { --callout-icon: var(--icon-triangle-alert); }
+
+.post-prose .callout[data-callout="failure"],
+.post-prose .callout[data-callout="fail"],
+.post-prose .callout[data-callout="missing"] { --callout-icon: var(--icon-x); }
+
+.post-prose .callout[data-callout="danger"],
+.post-prose .callout[data-callout="error"] { --callout-icon: var(--icon-zap); }
+
+.post-prose .callout[data-callout="bug"] { --callout-icon: var(--icon-bug); }
+
+.post-prose .callout[data-callout="example"] { --callout-icon: var(--icon-list); }
+
+.post-prose .callout[data-callout="quote"],
+.post-prose .callout[data-callout="cite"] { --callout-icon: var(--icon-quote); }
+
+/* colors per type (note, info and todo keep the default blue) */
+.post-prose .callout[data-callout="tip"],
+.post-prose .callout[data-callout="hint"],
+.post-prose .callout[data-callout="important"],
+.post-prose .callout[data-callout="success"],
+.post-prose .callout[data-callout="check"],
+.post-prose .callout[data-callout="done"] { --c: var(--color-success); }
+
+.post-prose .callout[data-callout="warning"],
+.post-prose .callout[data-callout="caution"],
+.post-prose .callout[data-callout="attention"],
+.post-prose .callout[data-callout="question"],
+.post-prose .callout[data-callout="help"],
+.post-prose .callout[data-callout="faq"] { --c: var(--color-warning); }
+
+.post-prose .callout[data-callout="danger"],
+.post-prose .callout[data-callout="error"],
+.post-prose .callout[data-callout="failure"],
+.post-prose .callout[data-callout="fail"],
+.post-prose .callout[data-callout="missing"],
+.post-prose .callout[data-callout="bug"] { --c: var(--color-error); }
+
+.post-prose .callout[data-callout="example"],
+.post-prose .callout[data-callout="abstract"],
+.post-prose .callout[data-callout="summary"],
+.post-prose .callout[data-callout="tldr"] { --c: var(--color-primary); }
+
+.post-prose .callout[data-callout="quote"],
+.post-prose .callout[data-callout="cite"] { --c: var(--color-info); }
+
+/*------------------- Table of contents -------------------*/
+.toc a { text-decoration: none; }
+.toc a:hover { color: var(--color-primary); }
+.toc a[aria-current="true"] { color: var(--color-primary); border-color: var(--color-primary); }
+
+/*------------------- Page layout: centered content -------------------*/
+:root {
+  --article-w: 44rem;
+  --wide-w: calc(1050px + 3rem);
+  --nav-h: 3.5rem;       /* top nav pill height incl. its top margin (48px + 8px) */
+  --rail-edge: 1rem;     /* space between the window edge and the floating ToC pill (same as the navbar's side margin) */
+}
+@media (min-width: 96rem) { :root { --article-w: 48rem; } }
+
+/* Author box: purple accents, to match the gradient dividers (purple -> blue -> orange) in the content. The pure
+   purple is too dark to read as text on the dark panel, so text uses a lighter tint of it. */
+.author-box {
+  --rail-accent: var(--color-accent);
+  --rail-accent-text: color-mix(in oklab, var(--color-accent) 55%, white);
+}
+
+.site-grid { width: 100%; padding: 2.5rem 1.5rem 0; flex-grow: 1; }
+.site-main { min-width: 0; margin-inline: auto; width: 100%; }
+.site-grid--wide .site-main { max-width: 1050px; }
+.site-grid--article .site-main { max-width: 48rem; }
+
+@media (min-width: 80rem) {
+  /* Full-bleed grid with equal outer columns, so the content is centered on the page. */
+  .site-grid { display: grid; padding: 0; grid-template-rows: 1fr auto; }
+  .site-grid--wide { grid-template-columns: minmax(0, 1fr) minmax(0, var(--wide-w)) minmax(0, 1fr); }
+  .site-grid--article { grid-template-columns: minmax(0, 1fr) minmax(0, var(--article-w)) minmax(0, 1fr); }
+  .site-main { grid-row: 1; grid-column: 2; padding-top: 2.5rem; }
+  /* the columns set the content width here, so drop the single-column max-widths above */
+  .site-grid--wide .site-main,
+  .site-grid--article .site-main { max-width: none; }
+  .site-grid--wide .site-main { padding-inline: 1.5rem; }
+  .site-footer { grid-row: 2; grid-column: 2; }
+}
+
+/*------------------- Author box -------------------*/
+.rail-card {
+  position: relative;
+  background: var(--color-base-200);
+  border: 1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);
+  border-radius: var(--radius-box);
+  padding: 1.25rem 1rem 1rem;
+  overflow: hidden;
+}
+/* author box */
+.author-box .avatar-ring { --tw-ring-color: var(--rail-accent); }
+.rail-accent-text { color: var(--rail-accent-text); }
+.rail-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 2rem;
+  margin-top: 0.75rem;
+  border: 1px solid var(--rail-accent);
+  border-radius: var(--radius-field);
+  color: var(--rail-accent-text);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background-color 0.15s, color 0.15s;
+}
+.rail-btn:hover { background: var(--rail-accent); color: #fff; }
+/* compact inline version used next to the icons in the author box */
+.author-box .rail-btn { width: auto; height: 1.5rem; margin-top: 0; padding-inline: 0.75rem; font-size: 0.75rem; }
+
+/*------------------- Table-of-contents pill -------------------*/
+/* The tick bar (one tick per heading + the reading-progress percentage) is shared by the desktop ToC pill and
+   the ToC button in the mobile nav pill; tocPill.js fills in the sizes and the active ticks. */
+.toc-ticks {
+  overflow: hidden;
+  --fade-l: 0px;
+  --fade-r: 0px;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent 100%);
+}
+.toc-ticks[data-more-l] { --fade-l: 14px; } /* ticks hidden to the left / right: fade that edge out */
+.toc-ticks[data-more-r] { --fade-r: 14px; }
+.toc-ticks-track {
+  display: flex;
+  align-items: center;
+  gap: var(--tick-gap, 3px);
+  height: 100%;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.toc-tick {
+  flex: none;
+  width: var(--tick-w, 6px);
+  height: 0.9rem;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--color-base-content) 28%, transparent);
+  transition: height 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.2s;
+}
+.toc-tick.is-sub { height: 0.55rem; }
+.toc-tick.is-past { background: color-mix(in oklab, var(--color-primary) 55%, transparent); }
+.toc-tick.is-current { height: 1.5rem; background: var(--color-primary); }
+.toc-percent {
+  flex: none;
+  text-align: right;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
+}
+
+/* Floats at the right edge, just under the nav pill (so the two can never overlap), from xl up. Same glass look
+   as the nav pill, with an orange edge. Open: the full list. Collapsed: a bar of ticks (one per heading) and the
+   reading progress. */
+.toc-pill { display: none; }
+
+@media (min-width: 80rem) {
+  .toc-pill {
+    --toc-w: 14rem;
+    --toc-top: calc(var(--nav-h) + 0.75rem); /* just under the nav pill while that is expanded ... */
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: fixed;
+    z-index: 30; /* under the nav pill (z-40) */
+    top: var(--toc-top);
+    right: var(--rail-edge);
+    width: var(--toc-w);
+    max-height: calc(100dvh - var(--toc-top) - var(--rail-edge));
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 1.5rem;
+    border: 1px solid color-mix(in oklab, var(--color-primary) 38%, transparent);
+    background: color-mix(in oklab, var(--color-base-200) 88%, transparent);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    backdrop-filter: blur(16px) saturate(1.4);
+    box-shadow: 0 8px 32px rgb(0 0 0 / 0.45);
+    transition: border-color 0.2s, top 0.4s var(--ease);
+  }
+  /* ... and up on the nav's row once the nav has folded down (it is then far too narrow to reach the ToC pill).
+     The slide up waits for the nav to finish shrinking; the slide back down starts at once, so the expanding nav
+     never runs into it. */
+  body[data-nav-collapsed] .toc-pill { --toc-top: 0.5rem; transition-delay: 0s, 0.25s; }
+  @supports (corner-shape: squircle) {
+    .toc-pill { corner-shape: superellipse(1.125); }
+  }
+  /* ... or always, when the window is wide enough that the fully expanded nav pill (52.1rem, centered) cannot
+     reach it. 85rem = nav half-width + gap + the pill + its edge gap, on both sides of center. */
+  @media (min-width: 85rem) {
+    .toc-pill, body[data-nav-collapsed] .toc-pill { --toc-top: 0.5rem; }
+  }
+  .toc-pill[data-pinned] { border-color: color-mix(in oklab, var(--color-primary) 75%, transparent); }
+
+  .toc-bar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    height: 3rem;
+    padding: 0 0.375rem 0 0.875rem;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s;
+  }
+  .toc-bar:hover { background: color-mix(in oklab, var(--color-base-content) 6%, transparent); }
+  .toc-bar:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -3px; border-radius: 1.5rem; }
+  .toc-bar-icon { flex: none; width: 1.1rem; height: 1.1rem; color: var(--color-primary); }
+
+  /* the middle of the bar: the title when open, the ticks when collapsed (stacked, cross-fading) */
+  .toc-bar-mid { position: relative; flex: 1; min-width: 0; height: 100%; }
+  .toc-bar-title,
+  .toc-ticks {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.2s ease;
+  }
+  .toc-bar-title { font-weight: 700; font-size: 0.9rem; white-space: nowrap; }
+  .toc-ticks { opacity: 0; }
+  .toc-percent { min-width: 2.2rem; }
+  .toc-chevron {
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0.2rem;
+    border-radius: 9999px;
+    color: color-mix(in oklab, var(--color-base-content) 80%, transparent);
+    transition: transform 0.3s var(--ease), background-color 0.15s, color 0.15s;
+  }
+  .toc-pill[data-pinned] .toc-chevron {
+    transform: rotate(180deg);
+    background: color-mix(in oklab, var(--color-primary) 25%, transparent);
+    color: var(--color-primary);
+  }
+
+  /* the list: the grid row animates from 0fr to 1fr, so the height needs no measuring */
+  .toc-panel {
+    display: grid;
+    grid-template-rows: 1fr;
+    min-height: 0;
+    transition: grid-template-rows 0.4s var(--ease);
+  }
+  .toc-panel-inner { min-height: 0; overflow-y: auto; overscroll-behavior: contain; transition: opacity 0.25s ease; }
+  .toc-panel-inner .toc {
+    padding: 0.5rem 0.75rem 0.875rem;
+    border-top: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+  }
+
+  /* collapsed: scrolled, and neither pinned, hovered nor keyboard-focused */
+  .toc-pill[data-scrolled]:not([data-pinned]):not([data-hover]):not(:has(:focus-visible)) .toc-panel { grid-template-rows: 0fr; transition-delay: 0.12s; }
+  .toc-pill[data-scrolled]:not([data-pinned]):not([data-hover]):not(:has(:focus-visible)) .toc-panel-inner { opacity: 0; }
+  .toc-pill[data-scrolled]:not([data-pinned]):not([data-hover]):not(:has(:focus-visible)) .toc-bar-title { opacity: 0; }
+  .toc-pill[data-scrolled]:not([data-pinned]):not([data-hover]):not(:has(:focus-visible)) .toc-ticks { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toc-pill, .toc-panel, .toc-panel-inner, .toc-tick, .toc-ticks-track, .toc-chevron, .toc-bar-title, .toc-ticks { transition: none !important; }
+}

@@ -1,0 +1,16 @@
+---
+import { SITE } from '../config';
+
+interface Props {
+  class?: string;
+}
+const { class: cls = '' } = Astro.props;
+---
+
+{SITE.logo
+  ? <img src={SITE.logo} alt={SITE.title} class:list={['h-10 w-auto', cls]} />
+  : (
+    <span class:list={['font-display font-bold tracking-tight', cls]}>
+      <span class="text-primary">[</span>{SITE.title}<span class="text-primary">]</span>
+    </span>
+  )}

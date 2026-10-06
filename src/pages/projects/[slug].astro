@@ -1,0 +1,54 @@
+---
+import { getProjects } from '../../lib/content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TocRail from '../../components/TocRail.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((project) => ({ params: { slug: project.data.slug }, props: { project } }));
+}
+
+const { data } = Astro.props.project;
+const showToc = data.headings.filter((h) => h.depth <= 3).length >= 3;
+const status = data.status ?? 'active';
+const stack = data.stack ?? [];
+const hasLinks = Boolean(data.repo || data.demo || data.writeup);
+---
+
+<BaseLayout title={data.title} description={data.description} image={data.cover} ogType="article" layout="article" toc={showToc ? data.headings : undefined}>
+  <article class="min-w-0">
+    {data.cover && <img src={data.cover} alt="" class="w-full mb-6 rounded-xl aspect-video object-cover" />}
+    <h1 class="text-4xl font-bold my-2">{data.title}</h1>
+
+    {(status !== 'active' || stack.length > 0) && (
+      <div class="flex flex-wrap items-center gap-2 mt-3">
+        {status !== 'active' && <span class="badge badge-primary capitalize">{status}</span>}
+        {stack.map((tech) => <span class="badge badge-outline">{tech}</span>)}
+      </div>
+    )}
+
+    {hasLinks && (
+      <div class="flex flex-wrap gap-3 mt-4">
+        {data.repo && <a href={data.repo} target="_blank" rel="noopener" class="btn btn-sm btn-outline btn-primary">Repo ↗</a>}
+        {data.demo && <a href={data.demo} target="_blank" rel="noopener" class="btn btn-sm btn-outline btn-primary">Demo ↗</a>}
+        {data.writeup && (
+          <a href={data.writeup} {...(/^https?:/i.test(data.writeup) ? { target: '_blank', rel: 'noopener' } : {})} class="btn btn-sm btn-accent">Read the write-up</a>
+        )}
+      </div>
+    )}
+    <hr class="slo-static-hr my-4" />
+
+    <div class="post-prose prose prose-lg max-w-none" set:html={data.html} />
+
+    <hr class="slo-static-hr my-8" />
+    <p><a href="/projects/" class="link link-hover">← All projects</a></p>
+    <AuthorBox />
+  </article>
+
+  {showToc && (
+    <Fragment slot="aside">
+      <TocRail headings={data.headings} />
+    </Fragment>
+  )}
+</BaseLayout>

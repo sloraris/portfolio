@@ -1,0 +1,20 @@
+---
+import { SITE } from '../config';
+
+interface Props {
+  class?: string;
+}
+const { class: cls = '' } = Astro.props;
+const { avatar, name } = SITE.author;
+---
+
+{avatar
+  ? <img src={avatar} alt={name} width="256" height="256" decoding="async" class:list={['avatar-ring rounded-full object-cover ring-2 ring-primary ring-offset-2 ring-offset-base-200', cls]} />
+  : (
+    <div
+      class:list={['avatar-ring rounded-full slo-bg-gradient grid place-items-center font-display font-bold text-base-300 ring-2 ring-primary ring-offset-2 ring-offset-base-200', cls]}
+      aria-hidden="true"
+    >
+      <span class="text-[2.5em] leading-none">{name.charAt(0).toLowerCase()}</span>
+    </div>
+  )}

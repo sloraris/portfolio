@@ -1,0 +1,21 @@
+---
+import { SITE } from '../config';
+import Avatar from './Avatar.astro';
+import SocialIcons from './SocialIcons.astro';
+
+const { author } = SITE;
+---
+
+<!-- Author info at the end of every post, page and project (there is no author sidebar). -->
+<aside class="rail-card author-box flex gap-4 items-start mt-8">
+  <Avatar class="h-16 w-16 shrink-0" />
+  <div class="min-w-0">
+    <p class="font-display text-lg font-bold leading-tight">{author.name}</p>
+    <p class="rail-accent-text text-sm font-display">{author.tagline}</p>
+    <p class="text-sm opacity-80 mt-2">{author.bio}</p>
+    <div class="flex items-center gap-1 mt-2 -ml-2">
+      <SocialIcons />
+      <a href="/about/" class="rail-btn ml-2">About me</a>
+    </div>
+  </div>
+</aside>

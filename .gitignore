@@ -1,6 +1,23 @@
-/public/
-/resources/_gen/
-/hugo_stats.json
+# Dependencies and build output
+node_modules/
+dist/
+.astro/
+
+# Images copied out of the vault at build time (see createAssetEmitter in src/lib/vault/render.mjs).
+# Regenerated on every build; the rest of public/ (avatar, logo, favicons, ...) IS tracked.
+/public/media/
+
+# A dev vault kept inside the repo (the loader's default CONTENT_DIR is ./content)
+/content/
+
+# Local config, in case one is ever added
+.env
+.env.*
+
+# Logs
+*.log
+
+# macOS
 .DS_Store
 .AppleDouble
 .LSOverride
@@ -9,4 +26,3 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
-*/node_modules

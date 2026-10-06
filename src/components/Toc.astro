@@ -1,0 +1,45 @@
+---
+interface Props {
+  headings: { depth: number; id: string; text: string }[];
+}
+
+const headings = Astro.props.headings.filter((h) => h.depth <= 3);
+---
+
+<nav class="toc" aria-label="Table of contents">
+  <ul class="space-y-1 text-sm">
+    {headings.map((h) => (
+      <li class:list={[h.depth === 3 && 'pl-4']}>
+        <a href={`#${h.id}`} class="block border-l-2 border-transparent pl-3 py-0.5 opacity-80 hover:opacity-100" data-toc-link>
+          {h.text}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<script>
+  // Highlight the section currently in view.
+  function initToc() {
+    const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
+    if (!links.length || !('IntersectionObserver' in window)) return;
+    const byId = new Map<string, HTMLAnchorElement[]>();
+    for (const l of links) {
+      const id = decodeURIComponent(l.hash.slice(1));
+      byId.set(id, [...(byId.get(id) ?? []), l]);
+    }
+    const targets = [...byId.keys()].map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          links.forEach((l) => l.removeAttribute('aria-current'));
+          byId.get(entry.target.id)?.forEach((l) => l.setAttribute('aria-current', 'true'));
+        }
+      },
+      { rootMargin: '-80px 0px -70% 0px' },
+    );
+    targets.forEach((t) => observer.observe(t));
+  }
+  document.addEventListener('astro:page-load', initToc);
+</script>

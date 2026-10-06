@@ -1,0 +1,97 @@
+name: Build and deploy
+
+# Runs when:
+#   - the site code changes (push to main)
+#   - the content repo says a note changed (repository_dispatch, sent by docs/content-repo/notify-site.yml)
+#   - you click "Run workflow" in the Actions tab
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+  repository_dispatch:
+    types: [content-updated]
+  workflow_dispatch:
+
+# Nothing is granted by default; each job asks for what it needs.
+permissions: {}
+
+# One deploy at a time. A newer run replaces a queued older one, and a deploy that is
+# already running is never cancelled halfway.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  ASTRO_TELEMETRY_DISABLED: '1'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      # Fail early with a readable message instead of a cryptic checkout error.
+      - name: Check the content repo is configured
+        env:
+          CONTENT_REPO: ${{ vars.CONTENT_REPO }}
+          TOKEN_IS_SET: ${{ secrets.CONTENT_REPO_TOKEN != '' }}
+        run: |
+          if [ -z "$CONTENT_REPO" ] || [ "$TOKEN_IS_SET" != "true" ]; then
+            echo "::error title=Content repo not configured::Set the repository variable CONTENT_REPO (owner/name) and the repository secret CONTENT_REPO_TOKEN (Settings > Secrets and variables > Actions). See 'One-time setup' in the README."
+            exit 1
+          fi
+
+      - name: Check out the site
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      # Your notes live in a separate private repo. The token only needs read-only
+      # "Contents" access to that one repo.
+      - name: Check out the content repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.CONTENT_REPO }}
+          token: ${{ secrets.CONTENT_REPO_TOKEN }}
+          path: content
+          fetch-depth: 0 # full history: a note without a `date:` falls back to its first commit date
+          persist-credentials: false # don't leave the token in content/.git/config for the build to read
+
+      - uses: pnpm/action-setup@v4 # version comes from "packageManager" in package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Tests only cover the site code, so a run that was triggered by a note changing skips them.
+      - name: Test
+        if: github.event_name != 'repository_dispatch'
+        run: pnpm test
+
+      # CI=true (set by GitHub) makes the build keep unpublished note names out of the logs, which are public.
+      - name: Build
+        run: pnpm build
+        env:
+          CONTENT_DIR: content
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

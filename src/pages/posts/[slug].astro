@@ -1,0 +1,47 @@
+---
+import { getPosts } from '../../lib/content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TocRail from '../../components/TocRail.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { formatDate, tagSlug } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.data.slug }, props: { post } }));
+}
+
+const { data } = Astro.props.post;
+const showToc = data.headings.filter((h) => h.depth <= 3).length >= 3;
+---
+
+<BaseLayout title={data.title} description={data.description} image={data.cover} ogType="article" layout="article" toc={showToc ? data.headings : undefined}>
+  <article class="min-w-0">
+    {data.cover && <img src={data.cover} alt="" class="w-full mb-6 rounded-xl aspect-video object-cover" />}
+    <h1 class="text-4xl font-bold my-2">{data.title}</h1>
+    <p class="opacity-80">
+      <time datetime={data.date.toISOString()}>{formatDate(data.date)}</time>
+      <span> · {data.readingTime} min read</span>
+      {data.updated && <span> · updated <time datetime={data.updated.toISOString()}>{formatDate(data.updated)}</time></span>}
+    </p>
+    {data.tags.length > 0 && (
+      <div class="flex flex-wrap gap-2 mt-2">
+        {data.tags.map((tag) => (
+          <a href={`/posts/tag/${tagSlug(tag)}/`} class="badge badge-outline hover:badge-primary">{tag}</a>
+        ))}
+      </div>
+    )}
+    <hr class="slo-static-hr my-4" />
+
+    <div class="post-prose prose prose-lg max-w-none" set:html={data.html} />
+
+    <hr class="slo-static-hr my-8" />
+    <p><a href="/posts/" class="link link-hover">← All posts</a></p>
+    <AuthorBox />
+  </article>
+
+  {showToc && (
+    <Fragment slot="aside">
+      <TocRail headings={data.headings} />
+    </Fragment>
+  )}
+</BaseLayout>

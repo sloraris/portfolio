@@ -1,0 +1,61 @@
+---
+import '../styles/global.css';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import TopNav from '../components/TopNav.astro';
+import { SITE } from '../config';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  ogType?: string;
+  /**
+   * wide    - content (home, lists)
+   * article - CENTERED article + floating table-of-contents pill via <Fragment slot="aside">
+   * bare    - no sidebars (404)
+   */
+  layout?: 'wide' | 'article' | 'bare';
+  /** headings of the page's table of contents (if it has one): shown in the bottom nav pill on small screens */
+  toc?: { depth: number; id: string; text: string }[];
+}
+
+const { title = SITE.title, description = SITE.description, image, ogType, layout = 'wide', toc } = Astro.props;
+const hasAside = Astro.slots.has('aside');
+---
+
+<!doctype html>
+<html lang="en" data-theme="sloraris">
+  <head>
+    <BaseHead title={title} description={description} image={image} ogType={ogType} />
+  </head>
+  <body>
+    <div class="nav-bottom-space flex flex-col bg-base-300 text-base-content min-h-screen min-w-[350px] max-w-[100vw]">
+      <TopNav toc={toc} />
+
+      {layout === 'bare'
+        ? (
+          <div class="md:flex md:justify-center flex-grow">
+            <main class="p-6 pt-10 w-full lg:max-w-[1050px]">
+              <slot />
+            </main>
+          </div>
+        )
+        : (
+          <div class:list={['site-grid', `site-grid--${layout}`]}>
+            <main class="site-main">
+              <slot />
+            </main>
+            {/* the table-of-contents pill: fixed to the window, so it does not take a grid column */}
+            {hasAside && <slot name="aside" />}
+            {/* inside the grid so the sidebars can run all the way to the bottom of the page */}
+            <div class="site-footer">
+              <Footer />
+            </div>
+          </div>
+        )}
+
+      {layout === 'bare' && <Footer />}
+    </div>
+  </body>
+</html>
