@@ -12,34 +12,36 @@
   themes: false;
 }
 
-/* The sloraris palette, carried over from the original site's DaisyUI theme. */
+/* The sloraris palette: deep navy darks sampled from the cosmic hero image; violet is the brand colour (main
+   button, nav, glows, gradient), cyan the cool secondary, and orange the attention colour (links, highlights,
+   important / warning callouts). Soft violet, bright violet and peach are extra tokens in @theme static below. */
 @plugin "daisyui/theme" {
   name: "sloraris";
   default: true;
   prefersdark: true;
   color-scheme: dark;
 
-  --color-base-100: #1f2937;
-  --color-base-200: #101721;
-  --color-base-300: #090f16;
-  --color-base-content: #e5e9f0;
+  --color-base-100: #161a36;
+  --color-base-200: #0d1026;
+  --color-base-300: #070a1a;
+  --color-base-content: #e6e9f7;
 
-  --color-primary: #fc8236;
-  --color-primary-content: #1a0d03;
-  --color-secondary: #60a5fa;
-  --color-secondary-content: #04121f;
-  --color-accent: #6f0fc2;
-  --color-accent-content: #f6ecff;
-  --color-neutral: #e7eff9;
-  --color-neutral-content: #1f2937;
+  --color-primary: #7c3aed;
+  --color-primary-content: #ffffff;
+  --color-secondary: #38bdf8;
+  --color-secondary-content: #02131c;
+  --color-accent: #fc8236;
+  --color-accent-content: #1a0d03;
+  --color-neutral: #e6e9f7;
+  --color-neutral-content: #0d1026;
 
   --color-info: #9ca3af;
   --color-info-content: #111827;
   --color-success: #4ade80;
   --color-success-content: #052e16;
-  --color-warning: #facc15;
-  --color-warning-content: #2b2200;
-  --color-error: #ef4444;
+  --color-warning: #fc8236;
+  --color-warning-content: #1a0d03;
+  --color-error: #f87171;
   --color-error-content: #2a0606;
 
   --radius-selector: 0.5rem;
@@ -58,6 +60,16 @@
   --font-mono: "Ubuntu Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
+/* Extra palette tokens (static, so they are always emitted and usable as text-soft, ring-glow, ...):
+   glow  - bright violet for borders, rings and glows (4.4:1 on the page background)
+   soft  - light violet for text and outlines (8:1)
+   peach - resting colour of links; hover / pressed turn full orange */
+@theme static {
+  --color-glow: #8b5cf6;
+  --color-soft: #b79cff;
+  --color-peach: #ffc59b;
+}
+
 /*------------------- Base -------------------*/
 html {
   scroll-behavior: smooth;
@@ -70,11 +82,7 @@ h1, h2, h3, h4, h5, h6, a, .btn {
 
 /*------------------- Gradient dividers & hovers (from the old site) -------------------*/
 .slo-bg-gradient {
-  background-image: linear-gradient(
-    45deg,
-    var(--color-accent), var(--color-accent), var(--color-secondary),
-    var(--color-primary), var(--color-primary)
-  );
+  background-image: var(--grad-space);
 }
 
 hr.slo-static-hr {
@@ -82,11 +90,7 @@ hr.slo-static-hr {
   border: 0;
   margin: 0.5rem 0;
   border-radius: 9999px;
-  background-image: linear-gradient(
-    45deg,
-    var(--color-accent), var(--color-accent), var(--color-secondary),
-    var(--color-primary), var(--color-primary)
-  );
+  background-image: var(--grad-space);
 }
 
 hr.slo-hr {
@@ -99,21 +103,13 @@ hr.slo-hr {
 .slo-bg-animated-static,
 hr.slo-hr {
   animation: animatedGradient 8s ease infinite alternate;
-  background-image: linear-gradient(
-    45deg,
-    var(--color-accent), var(--color-primary), var(--color-secondary),
-    var(--color-accent), var(--color-primary), var(--color-accent)
-  );
+  background-image: var(--grad-space-loop);
   background-size: 300% 300%;
 }
 
 .slo-bg-animated:hover {
   animation: animatedGradient 4s ease infinite alternate;
-  background-image: linear-gradient(
-    45deg,
-    var(--color-accent), var(--color-primary), var(--color-secondary),
-    var(--color-accent), var(--color-primary), var(--color-accent)
-  );
+  background-image: var(--grad-space-loop);
   background-size: 300% 300%;
 }
 
@@ -124,17 +120,26 @@ hr.slo-hr {
 }
 
 .post-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--color-glow) 14%, transparent);
   transition: ease-in-out 0.2s;
 }
-.post-card:hover {
-  background-color: var(--color-neutral);
-  color: var(--color-neutral-content);
-  scale: 1.01;
-  box-shadow: 0 0 15px 0 var(--color-secondary);
+/* a thin strip of the site gradient along the top edge */
+.post-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--grad-space);
+  z-index: 1;
+  pointer-events: none;
 }
-.post-card:hover .text-muted {
-  color: inherit;
-  opacity: 0.8;
+/* hover: the card lights up violet (it used to flip to a light card) */
+.post-card:hover {
+  border-color: color-mix(in oklab, var(--color-glow) 80%, transparent);
+  scale: 1.01;
+  box-shadow: 0 0 20px 0 color-mix(in oklab, var(--color-glow) 55%, transparent);
 }
 
 /*------------------- Nav: floating pill -------------------*/
@@ -154,7 +159,7 @@ hr.slo-hr {
   flex-direction: column; /* bar first in the DOM, but the panel opens above it */
   overflow: hidden;
   border-radius: 1.5rem;
-  border: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-glow) 30%, transparent);
   background: color-mix(in oklab, var(--color-base-200) 88%, transparent);
   -webkit-backdrop-filter: blur(16px) saturate(1.4);
   backdrop-filter: blur(16px) saturate(1.4);
@@ -189,7 +194,7 @@ hr.slo-hr {
   transition: background-color 0.15s, scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .nav-toggle:hover { background: color-mix(in oklab, var(--color-base-content) 10%, transparent); scale: 1.08; }
-.nav-toggle:focus-visible { outline: 2px solid var(--color-secondary); outline-offset: 2px; }
+.nav-toggle:focus-visible { outline: 2px solid var(--color-glow); outline-offset: 2px; }
 .nav-ham { width: 1.5rem; height: 1.5rem; }
 .nav-ham path {
   transform-box: fill-box;
@@ -227,14 +232,14 @@ hr.slo-hr {
   height: 2.25rem;
   padding: 0 0.6rem 0 0.7rem;
   border-radius: 9999px;
-  border: 1px solid color-mix(in oklab, var(--color-primary) 38%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-glow) 45%, transparent);
   color: inherit;
   cursor: pointer;
   transition: background-color 0.2s, border-color 0.2s, scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .nav-toc-btn:active { scale: 0.96; }
-.nav-toc-btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
-.nav-toc-icon { flex: none; width: 1.05rem; height: 1.05rem; color: var(--color-primary); }
+.nav-toc-btn:focus-visible { outline: 2px solid var(--color-glow); outline-offset: 2px; }
+.nav-toc-icon { flex: none; width: 1.05rem; height: 1.05rem; color: var(--color-soft); }
 .nav-toc-ticks { flex: 1; min-width: 0; height: 1.5rem; }
 .nav-toc-percent { min-width: 1.9rem; }
 .nav-toc-chevron {
@@ -245,8 +250,8 @@ hr.slo-hr {
   transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .nav-pill[data-toc-open] .nav-toc-btn {
-  background: color-mix(in oklab, var(--color-primary) 16%, transparent);
-  border-color: color-mix(in oklab, var(--color-primary) 70%, transparent);
+  background: color-mix(in oklab, var(--color-glow) 16%, transparent);
+  border-color: color-mix(in oklab, var(--color-glow) 75%, transparent);
 }
 .nav-pill[data-toc-open] .nav-toc-chevron { transform: rotate(180deg); }
 
@@ -280,8 +285,8 @@ hr.slo-hr {
 }
 
 .nav-tile {
-  --tone: var(--color-secondary);
-  --tone-ink: var(--color-secondary-content);
+  --tone: var(--color-glow);
+  --tone-ink: var(--color-primary-content);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -296,9 +301,6 @@ hr.slo-hr {
   transform: translateY(0.75rem) scale(0.96);
   transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.15s, border-color 0.15s, scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.nav-tile--blue { --tone: var(--color-secondary); --tone-ink: var(--color-secondary-content); }
-.nav-tile--orange { --tone: var(--color-primary); --tone-ink: var(--color-primary-content); }
-.nav-tile--purple { --tone: var(--color-accent); --tone-ink: var(--color-accent-content); }
 .nav-pill[data-open] .nav-tile {
   opacity: 1;
   transform: none;
@@ -314,15 +316,15 @@ hr.slo-hr {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 9999px;
-  background: var(--tone);
-  color: var(--tone-ink);
+  background: var(--color-primary);
+  color: var(--color-primary-content);
 }
 .nav-tile-icon svg { width: 1.3rem; height: 1.3rem; }
 .nav-tile-label { font-family: var(--font-display); font-weight: 600; font-size: 0.9rem; }
 
 /* About: a full-width bar, half the height of the tiles, outlined in the site gradient, avatar as its icon */
 .nav-about-tile {
-  --edge: linear-gradient(45deg, var(--color-accent), var(--color-secondary), var(--color-primary));
+  --edge: var(--grad-space);
   --fill: var(--color-base-300);
   display: flex;
   align-items: center;
@@ -343,8 +345,8 @@ hr.slo-hr {
   transition-delay: calc(70ms + var(--i, 0) * 50ms), calc(70ms + var(--i, 0) * 50ms), 0s, 0s;
 }
 .nav-about-tile:hover { --fill: color-mix(in oklab, var(--color-base-300) 82%, white); scale: 1.03; }
-.nav-about-tile.is-active { --fill: color-mix(in oklab, var(--color-accent) 24%, var(--color-base-300)); pointer-events: none; }
-.nav-about-tile:focus-visible { outline: 2px solid var(--color-secondary); outline-offset: 2px; }
+.nav-about-tile.is-active { --fill: color-mix(in oklab, var(--color-glow) 24%, var(--color-base-300)); pointer-events: none; }
+.nav-about-tile:focus-visible { outline: 2px solid var(--color-glow); outline-offset: 2px; }
 .nav-about-tile-avatar {
   flex: none;
   width: 2.25rem;
@@ -355,7 +357,7 @@ hr.slo-hr {
 .nav-about-tile-avatar--letter {
   display: grid;
   place-items: center;
-  background-image: linear-gradient(45deg, var(--color-accent), var(--color-secondary), var(--color-primary));
+  background-image: var(--grad-space);
   color: var(--color-base-300);
   font-family: var(--font-display);
   font-weight: 700;
@@ -456,11 +458,9 @@ hr.slo-hr {
     transition: width 0.4s var(--ease), background-color 0.15s, box-shadow 0.15s, scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .nav-link:hover { scale: 1.05; }
-  /* Home / Posts / Projects take the same colours as the menu tiles on small screens: purple, blue, orange.
-     Hovered: that colour as a tint; current page: the tint plus a ring in the colour (not clickable). */
-  .nav-link--purple { --tone: var(--color-accent); }
-  .nav-link--blue { --tone: var(--color-secondary); }
-  .nav-link--orange { --tone: var(--color-primary); }
+  /* Home / Posts / Projects share one violet tone, like the menu tiles on small screens.
+     Hovered: a tint of it; current page: the tint plus a ring (not clickable). */
+  .nav-link--tone { --tone: var(--color-glow); }
   .nav-link--tone:hover { background-color: color-mix(in oklab, var(--tone) 26%, transparent); }
   .nav-link--tone.is-active {
     pointer-events: none;
@@ -497,15 +497,15 @@ hr.slo-hr {
      the small-screen menu); compact, it is just the avatar inside the ring. Hovered it lightens, current page it
      takes a purple tint. */
   .nav-about {
-    --edge: linear-gradient(45deg, var(--color-accent), var(--color-secondary), var(--color-primary));
+    --edge: var(--grad-space);
     --fill: var(--color-base-200);
     justify-content: flex-start;
     border: 2px solid transparent;
     background: linear-gradient(var(--fill), var(--fill)) padding-box, var(--edge) border-box;
   }
   .nav-about:hover { --fill: color-mix(in oklab, var(--color-base-200) 82%, white); }
-  .nav-about.is-active { --fill: color-mix(in oklab, var(--color-accent) 24%, var(--color-base-200)); pointer-events: none; }
-  .nav-about:focus-visible { outline: 2px solid var(--color-secondary); outline-offset: 2px; }
+  .nav-about.is-active { --fill: color-mix(in oklab, var(--color-glow) 24%, var(--color-base-200)); pointer-events: none; }
+  .nav-about:focus-visible { outline: 2px solid var(--color-glow); outline-offset: 2px; }
   .nav-about-avatar {
     flex: none;
     width: calc(var(--btn-h) - 4px); /* the button's height minus its 2px border: the avatar is the button's left end */
@@ -516,7 +516,7 @@ hr.slo-hr {
   .nav-about-avatar--letter {
     display: grid;
     place-items: center;
-    background-image: linear-gradient(45deg, var(--color-accent), var(--color-secondary), var(--color-primary));
+    background-image: var(--grad-space);
     color: var(--color-base-300);
     font-family: var(--font-display);
     font-weight: 700;
@@ -564,14 +564,14 @@ hr.slo-hr {
 }
 
 /*------------------- Social links: hover -------------------*/
-/* Each icon takes one of the gradient's colours (purple -> blue -> orange, in the order they appear). */
+/* Each icon lights up in its own colour on hover: GitHub soft violet, LinkedIn cyan, RSS orange. */
 .social-link {
   --c: var(--color-base-content);
   transition: scale 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease, background-color 0.2s ease, box-shadow 0.25s ease;
 }
-.social-link--github { --c: color-mix(in oklab, var(--color-accent) 45%, white); }
+.social-link--github { --c: var(--color-soft); }
 .social-link--linkedin { --c: var(--color-secondary); }
-.social-link--rss { --c: var(--color-primary); }
+.social-link--rss { --c: var(--color-accent); }
 .social-link:hover,
 .social-link:focus-visible {
   color: var(--c);
@@ -594,9 +594,9 @@ hr.slo-hr {
     radial-gradient(1.5px 1.5px at 73% 30%, #fff, transparent),
     radial-gradient(1px 1px at 88% 62%, #fff9, transparent),
     radial-gradient(1px 1px at 93% 12%, #fff, transparent),
-    radial-gradient(circle at 18% 25%, color-mix(in oklab, var(--color-accent) 55%, transparent), transparent 55%),
-    radial-gradient(circle at 85% 80%, color-mix(in oklab, var(--color-secondary) 35%, transparent), transparent 50%),
-    radial-gradient(circle at 60% 10%, color-mix(in oklab, var(--color-primary) 22%, transparent), transparent 45%),
+    radial-gradient(circle at 18% 25%, color-mix(in oklab, var(--color-primary) 55%, transparent), transparent 55%),
+    radial-gradient(circle at 85% 80%, color-mix(in oklab, var(--color-secondary) 40%, transparent), transparent 50%),
+    radial-gradient(circle at 60% 10%, color-mix(in oklab, #0350a9 45%, transparent), transparent 45%),
     var(--color-base-300);
 }
 
@@ -605,13 +605,13 @@ hr.slo-hr {
   --tw-prose-body: var(--color-base-content);
   --tw-prose-headings: #fff;
   --tw-prose-lead: var(--color-base-content);
-  --tw-prose-links: var(--color-secondary);
+  --tw-prose-links: var(--link-rest);
   --tw-prose-bold: #fff;
-  --tw-prose-counters: var(--color-primary);
-  --tw-prose-bullets: var(--color-primary);
+  --tw-prose-counters: var(--color-soft);
+  --tw-prose-bullets: var(--color-soft);
   --tw-prose-hr: color-mix(in oklab, var(--color-base-content) 20%, transparent);
   --tw-prose-quotes: var(--color-base-content);
-  --tw-prose-quote-borders: var(--color-primary);
+  --tw-prose-quote-borders: var(--color-glow);
   --tw-prose-captions: var(--color-info);
   --tw-prose-code: var(--color-base-content);
   --tw-prose-pre-code: inherit;
@@ -623,11 +623,38 @@ hr.slo-hr {
 .post-prose h1, .post-prose h2, .post-prose h3, .post-prose h4 {
   font-family: var(--font-display);
 }
-.post-prose a { text-underline-offset: 3px; }
+/* Links rest in soft peach with an orange underline, so a link-heavy paragraph stays calm. Hover / pressed turn
+   the text full orange, thicken the underline and put a faint tint behind it. The underline must stay: peach is
+   too close to the body text colour to be told apart without it. Order matters: visited, then hover, then active. */
+.post-prose a {
+  text-decoration-line: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  border-radius: 3px;
+  transition: color 0.15s, background-color 0.15s, text-decoration-color 0.15s;
+}
+.post-prose a:visited {
+  color: var(--link-visited);
+  text-decoration-color: color-mix(in oklab, var(--color-accent) 40%, var(--color-base-300));
+}
+.post-prose a:hover {
+  color: var(--color-accent);
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 2px;
+  background-color: color-mix(in oklab, var(--color-accent) 14%, transparent);
+}
+.post-prose a:active {
+  color: var(--link-press);
+  text-decoration-color: var(--link-press);
+  text-decoration-thickness: 2px;
+  background-color: color-mix(in oklab, var(--color-accent) 28%, transparent);
+}
+.post-prose a:focus-visible { outline: 2px solid var(--color-glow); outline-offset: 2px; }
 .post-prose img, .post-prose video { border-radius: var(--radius-box); margin-inline: auto; }
 .post-prose table { display: block; overflow-x: auto; }
 .post-prose mark {
-  background: color-mix(in oklab, var(--color-primary) 35%, transparent);
+  background: color-mix(in oklab, var(--color-accent) 35%, transparent);
   color: inherit;
   padding: 0.05em 0.25em;
   border-radius: 0.25em;
@@ -774,20 +801,18 @@ hr.slo-hr {
 .post-prose .callout[data-callout="quote"],
 .post-prose .callout[data-callout="cite"] { --callout-icon: var(--icon-quote); }
 
-/* colors per type (note, info and todo keep the default blue) */
+/* colors per type: note, info, todo, question, help and faq keep the default cyan.
+   Orange is reserved for the callouts that need attention (important, warning, caution, attention). */
 .post-prose .callout[data-callout="tip"],
 .post-prose .callout[data-callout="hint"],
-.post-prose .callout[data-callout="important"],
 .post-prose .callout[data-callout="success"],
 .post-prose .callout[data-callout="check"],
 .post-prose .callout[data-callout="done"] { --c: var(--color-success); }
 
+.post-prose .callout[data-callout="important"],
 .post-prose .callout[data-callout="warning"],
 .post-prose .callout[data-callout="caution"],
-.post-prose .callout[data-callout="attention"],
-.post-prose .callout[data-callout="question"],
-.post-prose .callout[data-callout="help"],
-.post-prose .callout[data-callout="faq"] { --c: var(--color-warning); }
+.post-prose .callout[data-callout="attention"] { --c: var(--color-accent); }
 
 .post-prose .callout[data-callout="danger"],
 .post-prose .callout[data-callout="error"],
@@ -799,18 +824,24 @@ hr.slo-hr {
 .post-prose .callout[data-callout="example"],
 .post-prose .callout[data-callout="abstract"],
 .post-prose .callout[data-callout="summary"],
-.post-prose .callout[data-callout="tldr"] { --c: var(--color-primary); }
+.post-prose .callout[data-callout="tldr"] { --c: var(--color-soft); }
 
 .post-prose .callout[data-callout="quote"],
 .post-prose .callout[data-callout="cite"] { --c: var(--color-info); }
 
 /*------------------- Table of contents -------------------*/
 .toc a { text-decoration: none; }
-.toc a:hover { color: var(--color-primary); }
-.toc a[aria-current="true"] { color: var(--color-primary); border-color: var(--color-primary); }
+.toc a:hover { color: var(--color-soft); }
+.toc a[aria-current="true"] { color: var(--color-accent); border-color: var(--color-accent); }
 
 /*------------------- Page layout: centered content -------------------*/
 :root {
+  /* the site gradient: bright violet -> blue -> cyan, blended in oklch so it never goes muddy */
+  --grad-space: linear-gradient(90deg in oklch, var(--color-glow), #4f7cf5 55%, var(--color-secondary));
+  --grad-space-loop: linear-gradient(45deg in oklch, var(--color-glow), var(--color-secondary), var(--color-glow), #4f7cf5, var(--color-secondary), var(--color-glow));
+  --link-rest: var(--color-peach);
+  --link-press: #ff9a57;
+  --link-visited: #d9b8a6;
   --article-w: 44rem;
   --wide-w: calc(1050px + 3rem);
   --nav-h: 3.5rem;       /* top nav pill height incl. its top margin (48px + 8px) */
@@ -818,11 +849,11 @@ hr.slo-hr {
 }
 @media (min-width: 96rem) { :root { --article-w: 48rem; } }
 
-/* Author box: purple accents, to match the gradient dividers (purple -> blue -> orange) in the content. The pure
-   purple is too dark to read as text on the dark panel, so text uses a lighter tint of it. */
+/* Author box: violet accents to match the gradient dividers. Borders and rings use the bright violet; text
+   uses the soft one so it reads on the dark panel. */
 .author-box {
-  --rail-accent: var(--color-accent);
-  --rail-accent-text: color-mix(in oklab, var(--color-accent) 55%, white);
+  --rail-accent: var(--color-glow);
+  --rail-accent-text: var(--color-soft);
 }
 
 .site-grid { width: 100%; padding: 2.5rem 1.5rem 0; flex-grow: 1; }
@@ -853,6 +884,10 @@ hr.slo-hr {
   overflow: hidden;
 }
 /* author box */
+.rail-card.author-box {
+  background: color-mix(in oklab, var(--color-primary) 8%, var(--color-base-200));
+  border-color: color-mix(in oklab, var(--color-glow) 35%, transparent);
+}
 .author-box .avatar-ring { --tw-ring-color: var(--rail-accent); }
 .rail-accent-text { color: var(--rail-accent-text); }
 .rail-btn {
@@ -869,7 +904,7 @@ hr.slo-hr {
   font-weight: 600;
   transition: background-color 0.15s, color 0.15s;
 }
-.rail-btn:hover { background: var(--rail-accent); color: #fff; }
+.rail-btn:hover { background: var(--color-primary); color: var(--color-primary-content); }
 /* compact inline version used next to the icons in the author box */
 .author-box .rail-btn { width: auto; height: 1.5rem; margin-top: 0; padding-inline: 0.75rem; font-size: 0.75rem; }
 
@@ -901,8 +936,8 @@ hr.slo-hr {
   transition: height 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.2s;
 }
 .toc-tick.is-sub { height: 0.55rem; }
-.toc-tick.is-past { background: color-mix(in oklab, var(--color-primary) 55%, transparent); }
-.toc-tick.is-current { height: 1.5rem; background: var(--color-primary); }
+.toc-tick.is-past { background: color-mix(in oklab, var(--color-accent) 55%, transparent); }
+.toc-tick.is-current { height: 1.5rem; background: var(--color-accent); }
 .toc-percent {
   flex: none;
   text-align: right;
@@ -912,7 +947,7 @@ hr.slo-hr {
 }
 
 /* Floats at the right edge, just under the nav pill (so the two can never overlap), from xl up. Same glass look
-   as the nav pill, with an orange edge. Open: the full list. Collapsed: a bar of ticks (one per heading) and the
+   as the nav pill, with a violet edge. Open: the full list. Collapsed: a bar of ticks (one per heading) and the
    reading progress. */
 .toc-pill { display: none; }
 
@@ -931,7 +966,7 @@ hr.slo-hr {
     flex-direction: column;
     overflow: hidden;
     border-radius: 1.5rem;
-    border: 1px solid color-mix(in oklab, var(--color-primary) 38%, transparent);
+    border: 1px solid color-mix(in oklab, var(--color-glow) 45%, transparent);
     background: color-mix(in oklab, var(--color-base-200) 88%, transparent);
     -webkit-backdrop-filter: blur(16px) saturate(1.4);
     backdrop-filter: blur(16px) saturate(1.4);
@@ -950,7 +985,7 @@ hr.slo-hr {
   @media (min-width: 85rem) {
     .toc-pill, body[data-nav-collapsed] .toc-pill { --toc-top: 0.5rem; }
   }
-  .toc-pill[data-pinned] { border-color: color-mix(in oklab, var(--color-primary) 75%, transparent); }
+  .toc-pill[data-pinned] { border-color: color-mix(in oklab, var(--color-glow) 85%, transparent); }
 
   .toc-bar {
     flex: none;
@@ -966,8 +1001,8 @@ hr.slo-hr {
     transition: background-color 0.15s;
   }
   .toc-bar:hover { background: color-mix(in oklab, var(--color-base-content) 6%, transparent); }
-  .toc-bar:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -3px; border-radius: 1.5rem; }
-  .toc-bar-icon { flex: none; width: 1.1rem; height: 1.1rem; color: var(--color-primary); }
+  .toc-bar:focus-visible { outline: 2px solid var(--color-glow); outline-offset: -3px; border-radius: 1.5rem; }
+  .toc-bar-icon { flex: none; width: 1.1rem; height: 1.1rem; color: var(--color-soft); }
 
   /* the middle of the bar: the title when open, the ticks when collapsed (stacked, cross-fading) */
   .toc-bar-mid { position: relative; flex: 1; min-width: 0; height: 100%; }
@@ -993,8 +1028,8 @@ hr.slo-hr {
   }
   .toc-pill[data-pinned] .toc-chevron {
     transform: rotate(180deg);
-    background: color-mix(in oklab, var(--color-primary) 25%, transparent);
-    color: var(--color-primary);
+    background: color-mix(in oklab, var(--color-glow) 25%, transparent);
+    color: var(--color-soft);
   }
 
   /* the list: the grid row animates from 0fr to 1fr, so the height needs no measuring */
@@ -1019,4 +1054,43 @@ hr.slo-hr {
 
 @media (prefers-reduced-motion: reduce) {
   .toc-pill, .toc-panel, .toc-panel-inner, .toc-tick, .toc-ticks-track, .toc-chevron, .toc-bar-title, .toc-ticks { transition: none !important; }
+}
+
+/*------------------- Home hero -------------------*/
+/* The cosmic image shows through with a violet wash from the left (where the nebula's violet filaments are) and a
+   dark scrim top and bottom so the headline stays readable over the bright cyan glow. */
+.hero-frame {
+  border-color: color-mix(in oklab, var(--color-glow) 55%, transparent);
+  box-shadow: 0 0 28px color-mix(in oklab, var(--color-primary) 35%, transparent);
+}
+.hero-scrim {
+  background:
+    linear-gradient(110deg, color-mix(in oklab, var(--color-primary) 42%, transparent), transparent 62%),
+    linear-gradient(rgb(7 10 26 / 0.6), rgb(7 10 26 / 0.33) 50%, rgb(7 10 26 / 0.6));
+}
+.hero-copy { text-shadow: 0 2px 18px rgb(0 0 0 / 0.65); }
+
+/*------------------- Links, tags, buttons -------------------*/
+/* Standalone links ("All posts ->", "Repo", footer): same peach -> orange behaviour as links in post content. */
+a.link {
+  color: var(--link-rest);
+  text-decoration-color: var(--color-accent);
+  text-underline-offset: 4px;
+}
+a.link:hover { color: var(--color-accent); }
+
+/* Tags: soft violet outline; as links they light up bright violet on hover. */
+span.badge-outline, a.badge-outline:not(:hover) { --badge-color: var(--color-soft); }
+a.badge-outline:hover {
+  --badge-color: var(--color-soft);
+  --badge-bg: color-mix(in oklab, var(--color-glow) 22%, transparent);
+  border-color: var(--color-glow);
+}
+
+/* The main button glows like the rest of the violet. */
+.btn-primary:not(.btn-outline) { box-shadow: 0 0 16px color-mix(in oklab, var(--color-glow) 45%, transparent); }
+
+/* A tinted outline button, for sitting over the hero image: a faint fill of its own colour at rest. */
+.btn-tonal:not(:hover):not(:focus-visible) {
+  --btn-bg: color-mix(in oklab, var(--btn-color) 14%, rgb(7 10 26 / 0.55));
 }

@@ -84,21 +84,22 @@ and a color from the site's palette. Aliases look identical to the type they bel
 
 | Type (and aliases)                    | Icon          | Color  |
 | ------------------------------------- | ------------- | ------ |
-| `note`                                | pencil        | blue   |
-| `info`                                | info          | blue   |
-| `todo`                                | circled check | blue   |
-| `abstract`, `summary`, `tldr`         | clipboard     | orange |
-| `example`                             | list          | orange |
-| `tip`, `hint`, `important`            | flame         | green  |
+| `note`                                | pencil        | cyan   |
+| `info`                                | info          | cyan   |
+| `todo`                                | circled check | cyan   |
+| `abstract`, `summary`, `tldr`         | clipboard     | violet |
+| `example`                             | list          | violet |
+| `tip`, `hint`                         | flame         | green  |
+| `important`                           | flame         | orange |
 | `success`, `check`, `done`            | check         | green  |
-| `question`, `help`, `faq`             | circled ?     | yellow |
-| `warning`, `caution`, `attention`     | triangle      | yellow |
+| `question`, `help`, `faq`             | circled ?     | cyan   |
+| `warning`, `caution`, `attention`     | triangle      | orange |
 | `failure`, `fail`, `missing`          | x             | red    |
 | `danger`, `error`                     | lightning     | red    |
 | `bug`                                 | bug           | red    |
 | `quote`, `cite`                       | quote marks   | gray   |
 
-Any other type (`[!anything]`) still renders, as a note: blue with the pencil, titled with the type name.
+Any other type (`[!anything]`) still renders, as a note: cyan with the pencil, titled with the type name.
 
 The icons are [Lucide](https://lucide.dev) shapes drawn in CSS (`src/styles/global.css`, under "Obsidian callouts"),
 so there is nothing to install. To add a type, give it a `--callout-icon` and a `--c` color there.
@@ -261,13 +262,15 @@ Everything lives in `public/` and is referenced by URL path in `src/config.ts`.
 | `public/favicon.ico`, `favicon-16x16.png`, `favicon-32x32.png` | Picked up automatically (`.ico`). |
 | `public/apple-touch-icon.png` | 180x180. Picked up automatically if the file exists.                         |
 | `public/android-chrome-*.png`, `site.webmanifest` | Home-screen icons; the manifest is linked automatically. |
-| `public/img/cosmic.jpg`       | `heroImage: '/img/cosmic.jpg'` for the home page hero.                       |
+| `public/cosmic.jpg`           | `heroImage: '/cosmic.jpg'` for the home page hero (already set).             |
 
 The logo and favicons from the old site are already in place. Until you set the avatar and hero image, the site shows a gradient avatar placeholder and a CSS starfield.
 
 ## Making it yours
 
-- Colors, radii: the `daisyui/theme` block at the top of `src/styles/global.css`.
+- Colors, radii: the `daisyui/theme` block at the top of `src/styles/global.css`. Bright violet (`glow`), soft violet
+  (`soft`) and peach (links at rest) are `@theme static` tokens right under it. Orange is reserved for links,
+  highlights and the important / warning callouts, so it draws the eye when it appears.
 - Name, bio, links: `src/config.ts`.
 - Fonts (Exo 2, Ubuntu, Ubuntu Mono) are self-hosted, nothing loads from Google.
 - No analytics are included (the old site's Google tag was deliberately not carried over).

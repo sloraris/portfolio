@@ -10,7 +10,7 @@ export const SITE = {
 
   // null = built-in placeholder
   logo: '/logo.svg' as string | null,
-  heroImage: null as string | null,
+  heroImage: '/cosmic.jpg' as string | null,
 
   // Shown in the nav pill's About button and in the author box at the end of every post, page and project.
   author: {

@@ -23,10 +23,6 @@ const left = NAV.filter((n) => n.id !== 'about');
 const about = NAV.find((n) => n.id === 'about') ?? { id: 'about', label: 'About', href: '/about/' };
 const { author } = SITE;
 
-// Home purple, Posts blue, Projects orange (the gradient's order). Used for the menu tiles below xl and for the
-// hover / current-page colour of the links on wide screens. About is outlined in the whole gradient instead.
-const tone: Record<string, string> = { home: 'purple', posts: 'blue', projects: 'orange' };
-
 // 24x24 stroke icons
 const icons: Record<string, string> = {
   home: '<path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/>',
@@ -63,7 +59,7 @@ const icons: Record<string, string> = {
             <li>
               <a
                 href={item.href}
-                class:list={['nav-link', 'nav-link--tone', `nav-link--${tone[item.id] ?? 'blue'}`, item.id === activeId && 'is-active']}
+                class:list={['nav-link', 'nav-link--tone', item.id === activeId && 'is-active']}
                 aria-current={item.id === activeId ? 'page' : undefined}
               >
                 <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={icons[item.id] ?? icons.posts} />
@@ -140,7 +136,7 @@ const icons: Record<string, string> = {
             <li style={`--i:${i}`}>
               <a
                 href={item.href}
-                class:list={['nav-tile', `nav-tile--${tone[item.id] ?? 'blue'}`, item.id === activeId && 'is-active']}
+                class:list={['nav-tile', item.id === activeId && 'is-active']}
                 aria-current={item.id === activeId ? 'page' : undefined}
               >
                 <span class="nav-tile-icon">

@@ -12,24 +12,24 @@ const showProjects = await hasProjects();
 ---
 
 <BaseLayout>
-  <div class="mockup-window border border-secondary bg-base-200">
+  <div class="mockup-window border hero-frame bg-base-200">
     <div class="relative overflow-hidden rounded-xl">
       {SITE.heroImage
-        ? <img src={SITE.heroImage} alt="" class="absolute inset-0 w-full h-full object-cover blur-sm" />
+        ? <img src={SITE.heroImage} alt="" class="absolute inset-0 w-full h-full object-cover" />
         : <div class="absolute inset-0 cosmic"></div>}
-      <div class="absolute inset-0 bg-black/45"></div>
+      <div class="absolute inset-0 hero-scrim"></div>
       <div class="relative px-6 py-16 sm:py-24 text-center flex flex-col items-center gap-4">
-        <h1 class="text-3xl sm:text-5xl font-bold text-balance max-w-3xl">
+        <h1 class="text-3xl sm:text-5xl font-bold text-balance max-w-3xl hero-copy">
           I build infrastructure that stays up, and occasionally break it on purpose.
         </h1>
-        <p class="max-w-xl">
+        <p class="max-w-xl hero-copy">
           Self-hosted infrastructure, networking, and automation, with a security background. This is where the
           projects and write-ups live.
         </p>
         <div class="flex flex-row flex-wrap justify-center gap-4 pt-2 w-full">
           {/* One primary action: Projects. Posts is primary only while there are no projects to point at. */}
-          {showProjects && <a href="/projects/" class="btn btn-secondary btn-wide hover:scale-[1.02]">Projects</a>}
-          <a href="/posts/" class:list={['btn btn-accent btn-wide hover:scale-[1.02]', showProjects && 'btn-outline']}>Read Posts</a>
+          {showProjects && <a href="/projects/" class="btn btn-primary btn-wide hover:scale-[1.02]">Projects</a>}
+          <a href="/posts/" class:list={['btn btn-wide hover:scale-[1.02]', showProjects ? 'btn-secondary btn-outline btn-tonal' : 'btn-primary']}>Read Posts</a>
           <a href={SITE.github} target="_blank" rel="noopener" class="btn btn-ghost btn-wide hover:scale-[1.02]">GitHub</a>
         </div>
       </div>
