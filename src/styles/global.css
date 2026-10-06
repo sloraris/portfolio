@@ -1371,10 +1371,14 @@ hr.slo-hr {
   flex-direction: column;
   justify-content: flex-end;
   color: color-mix(in oklab, var(--color-base-content) 88%, transparent);
+  transition: opacity 0.4s ease;
   cursor: pointer; /* a hidden extra: click it for the next quote (see Hero.astro) */
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
+/* held back until the script has the page settled (it removes data-pending); the fallback shows it anyway if it never does */
+.hero-eyebrow[data-pending] { opacity: 0; animation: hero-eyebrow-failsafe 0.4s ease 6s forwards; }
+@keyframes hero-eyebrow-failsafe { to { opacity: 1; } }
 .hero-line { display: block; text-wrap: balance; }
 .hero-prompt { color: var(--color-soft); margin-right: 0.6ch; }
 .hero-typed { transition: color 0.35s ease; }
@@ -1395,6 +1399,11 @@ hr.slo-hr {
 /* entrance: everything rises in one after the other */
 .hero-rise { animation: hero-rise 0.85s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0ms) backwards; }
 @keyframes hero-rise {
+  from { opacity: 0; translate: 0 14px; }
+}
+/* the headline alone keeps the soft focus on its way in */
+.hero-title.hero-rise { animation-name: hero-rise-blur; }
+@keyframes hero-rise-blur {
   from { opacity: 0; translate: 0 14px; filter: blur(6px); }
 }
 

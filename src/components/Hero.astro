@@ -33,7 +33,7 @@ const skyGlow = sky(7, 99, ['#b79cff', '#7dd3fc', '#ffd9bf'], 3);
 
   <div class="hero-inner">
     <!-- decorative: the paragraph below says the same thing in plain text -->
-    <p class="hero-eyebrow hero-rise" style="--d: 0ms" aria-hidden="true">
+    <p class="hero-eyebrow" data-pending aria-hidden="true">
       <span class="hero-line">
         <span class="hero-prompt">&gt;</span>
         <span class="hero-typed" data-quotes={JSON.stringify(quotes)}>{quotes[0]}</span><span class="hero-caret"></span>
@@ -46,6 +46,9 @@ const skyGlow = sky(7, 99, ['#b79cff', '#7dd3fc', '#ffd9bf'], 3);
       This is where my projects and write-ups live. Self-hosted infrastructure, platforms, networking, and automation, all from a security background.
     </p>
   </div>
+
+  <!-- the quote line stays hidden until the script has the page settled and phases it in (see below) -->
+  <noscript><style>.hero-eyebrow[data-pending] { opacity: 1; animation: none; }</style></noscript>
 
   <!-- the one call to action: an arrow that points at the recent work and takes you there -->
   <a class="hero-cue" href={`#${target}`} aria-label="Scroll down to the latest projects and posts">
@@ -75,6 +78,10 @@ const skyGlow = sky(7, 99, ['#b79cff', '#7dd3fc', '#ffd9bf'], 3);
     const eyebrow = document.querySelector<HTMLElement>('.hero-eyebrow');
     const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 
+    // the line is held back until the page has settled, then phased in: everything else on the hero loads first
+    const reveal = () => eyebrow?.removeAttribute('data-pending');
+    if (!(hero && typed && caret) || reduce.matches) reveal();
+
     if (hero && typed && caret && !reduce.matches) {
       // Parallax: the nebula and the stars drift a few pixels against the pointer, at different depths.
       if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
@@ -102,6 +109,7 @@ const skyGlow = sky(7, 99, ['#b79cff', '#7dd3fc', '#ffd9bf'], 3);
         /* keep the static quote */
       }
 
+      if (words.length <= 1) reveal();
       if (words.length > 1) {
         let onScreen = true;
         new IntersectionObserver(([entry]) => (onScreen = entry.isIntersecting)).observe(hero);
@@ -172,7 +180,22 @@ const skyGlow = sky(7, 99, ['#b79cff', '#7dd3fc', '#ffd9bf'], 3);
           delete caret.dataset.typing;
           timer = setTimeout(() => show(next()), 2200 + text.length * 60); // longer lines get a little longer to be read
         };
-        timer = setTimeout(() => show(next()), 2600);
+
+        // First load: wait for the page (hero image included) and an idle moment, then a beat for the headline to land.
+        // The line comes up empty (prompt and caret first), and the first quote decodes in out of the noise.
+        const settled = new Promise<void>((resolve) => {
+          const idle = () => ('requestIdleCallback' in window ? requestIdleCallback(() => resolve(), { timeout: 600 }) : setTimeout(resolve, 100));
+          if (document.readyState === 'complete') idle();
+          else addEventListener('load', idle, { once: true });
+        });
+        settled.then(async () => {
+          await wait(400);
+          if (!typed.isConnected || latest !== 0) return reveal(); // navigated away, or already clicked: nothing to phase in
+          typed.textContent = '';
+          reveal();
+          await wait(350); // the line fades in, then the quote starts decoding
+          if (latest === 0) show(0);
+        });
 
         // click (or tap) the line for the next quote straight away
         eyebrow?.addEventListener('click', () => show(next()));
