@@ -9,6 +9,11 @@ import { scanVault } from '../src/lib/vault/scan.mjs';
 import { stripComments } from '../src/lib/vault/comments.mjs';
 import { parseYoutube } from '../src/lib/vault/plugins.mjs';
 
+// GitHub Actions sets CI=true, which makes the loader redact note names from its warnings (the logs are
+// public). Most tests assert on the full warning text, so run them as on a laptop; the tests that cover
+// the CI behaviour set CI themselves and put it back afterwards.
+delete process.env.CI;
+
 const FIXTURES = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures/vault');
 
 function tmp() {
