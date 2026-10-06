@@ -671,31 +671,6 @@ hr.slo-hr {
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='16' viewBox='0 0 96 16'%3E%3Cg fill='%23b79cff' fill-opacity='.75'%3E%3Cpath id='s' d='M16 1c.7 4.8 2.2 6.3 7 7-4.8.7-6.3 2.2-7 7-.7-4.8-2.2-6.3-7-7 4.8-.7 6.3-2.2 7-7z'/%3E%3Cpath d='M48 1c.7 4.8 2.2 6.3 7 7-4.8.7-6.3 2.2-7 7-.7-4.8-2.2-6.3-7-7 4.8-.7 6.3-2.2 7-7z'/%3E%3Cpath d='M80 1c.7 4.8 2.2 6.3 7 7-4.8.7-6.3 2.2-7 7-.7-4.8-2.2-6.3-7-7 4.8-.7 6.3-2.2 7-7z'/%3E%3C/g%3E%3C/svg%3E") no-repeat center / 96px 16px;
 }
 
-/* "#" after a heading: shows on hover / keyboard focus and copies the link to that section (src/lib/headingAnchors.js). */
-.post-prose a.heading-anchor,
-.post-prose a.heading-anchor:visited {
-  margin-left: 0.35em;
-  font-family: var(--font-mono);
-  font-size: 0.8em;
-  font-weight: 400;
-  color: var(--color-soft);
-  text-decoration: none;
-  background: none;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-.post-prose :is(h2, h3, h4):hover > a.heading-anchor,
-.post-prose a.heading-anchor:focus-visible { opacity: 0.8; }
-.post-prose a.heading-anchor:hover,
-.post-prose a.heading-anchor:active { opacity: 1; color: var(--color-secondary); text-decoration: none; background: none; }
-.post-prose a.heading-anchor[data-copied]::after {
-  content: " copied";
-  font-size: 0.85em;
-  color: var(--color-success);
-}
-@media (hover: none) {
-  .post-prose a.heading-anchor { opacity: 0.4; } /* no hover on touch screens: keep it, dimly */
-}
 /* Links are orange, so they draw the eye. Hover lightens the text, thickens the underline and puts a faint tint behind
    it; pressed flashes paler still. Links you have already opened turn soft peach (the underline stays orange, dimmer).
    Order matters: visited, then hover, then active. */
@@ -1327,20 +1302,24 @@ hr.slo-hr {
   bottom: 1.25rem;
   left: 0;
   right: 0;
-  margin-inline: auto; /* centred without `translate`, which the entrance animation uses */
+  margin-inline: auto; /* centred without `translate`, which the chevrons use */
   width: 4rem;
   height: 4.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  --cue-glow: var(--color-glow);
   color: #e4dcff;
-  filter: drop-shadow(0 0 9px color-mix(in oklab, var(--color-glow) 85%, transparent));
   border-radius: 9999px;
-  transition: color 0.2s ease, filter 0.2s ease;
+  transition: color 0.2s ease;
+  animation: hero-cue-in 0.85s ease 0.7s backwards; /* opacity only: no CSS filter (Safari blurs those) */
 }
+@keyframes hero-cue-in { from { opacity: 0; } }
+/* the glow is drawn inside the SVG (see Hero.astro, #cue-glow), so it is re-rendered sharp at any resolution */
 .hero-cue svg {
   display: block;
+  overflow: visible;
   width: 2.5rem;
   height: 2.5rem;
   margin-block: -0.8rem;
@@ -1352,16 +1331,14 @@ hr.slo-hr {
   animation: hero-cue 2.2s ease-in-out infinite;
 }
 .hero-cue svg:nth-child(2) { animation-delay: 0.3s; opacity: 0.6; }
+.hero-cue-glow { flood-color: var(--cue-glow); }
 @keyframes hero-cue {
   0%   { opacity: 0; translate: 0 -8px; }
   35%  { opacity: 1; }
   70%  { opacity: 1; }
   100% { opacity: 0; translate: 0 10px; }
 }
-.hero-cue:hover, .hero-cue:focus-visible {
-  color: var(--link-hover);
-  filter: drop-shadow(0 0 10px color-mix(in oklab, var(--link-hover) 60%, transparent));
-}
+.hero-cue:hover, .hero-cue:focus-visible { --cue-glow: var(--link-hover); color: var(--link-hover); }
 .hero-cue:hover svg { animation-duration: 1.2s; }
 .hero-cue:focus-visible { outline: 2px solid var(--link-hover); outline-offset: 2px; }
 @media (max-width: 40rem) { .hero-cue { bottom: 0.5rem; } }
@@ -1371,12 +1348,18 @@ hr.slo-hr {
   font-family: var(--font-mono, 'Ubuntu Mono', ui-monospace, monospace);
   font-size: 1.125rem;
   letter-spacing: 0.04em;
-  min-height: 1.75rem;
+  /* One line tall, whatever the quote: a quote that wraps grows upwards (the line is anchored to the bottom and
+     overflows at the top), so the heading below never moves. */
+  height: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   color: color-mix(in oklab, var(--color-base-content) 88%, transparent);
   cursor: pointer; /* a hidden extra: click it for the next quote (see Hero.astro) */
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
+.hero-line { display: block; text-wrap: balance; }
 .hero-prompt { color: var(--color-soft); margin-right: 0.6ch; }
 .hero-typed { transition: color 0.35s ease; }
 .hero-typed[data-decoding] { color: var(--color-secondary); transition: none; } /* cyan while it scrambles, then it locks in */

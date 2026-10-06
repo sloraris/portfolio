@@ -34,8 +34,10 @@ const skyGlow = sky(7, 99, ['#b79cff', '#7dd3fc', '#ffd9bf'], 3);
   <div class="hero-inner">
     <!-- decorative: the paragraph below says the same thing in plain text -->
     <p class="hero-eyebrow hero-rise" style="--d: 0ms" aria-hidden="true">
-      <span class="hero-prompt">&gt;</span>
-      <span class="hero-typed" data-quotes={JSON.stringify(quotes)}>{quotes[0]}</span><span class="hero-caret"></span>
+      <span class="hero-line">
+        <span class="hero-prompt">&gt;</span>
+        <span class="hero-typed" data-quotes={JSON.stringify(quotes)}>{quotes[0]}</span><span class="hero-caret"></span>
+      </span>
     </p>
     <h1 id="hero-title" class="hero-title hero-copy hero-rise" style="--d: 120ms">
       Hello, I'm sloraris.
@@ -46,9 +48,20 @@ const skyGlow = sky(7, 99, ['#b79cff', '#7dd3fc', '#ffd9bf'], 3);
   </div>
 
   <!-- the one call to action: an arrow that points at the recent work and takes you there -->
-  <a class="hero-cue hero-rise" style="--d: 700ms" href={`#${target}`} aria-label="Scroll down to the latest projects and posts">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5l7 7 7-7" /></svg>
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5l7 7 7-7" /></svg>
+  <a class="hero-cue" href={`#${target}`} aria-label="Scroll down to the latest projects and posts">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <defs>
+        <!-- glow drawn in the SVG itself: the arrow's shape, blurred, in --cue-glow, under the sharp arrow -->
+        <filter id="cue-glow" filterUnits="userSpaceOnUse" x="-12" y="-12" width="48" height="48">
+          <feFlood class="hero-cue-glow" flood-opacity="0.9" result="c" />
+          <feComposite in="c" in2="SourceAlpha" operator="in" result="tint" />
+          <feGaussianBlur in="tint" stdDeviation="2.4" result="blur" />
+          <feMerge><feMergeNode in="blur" /><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+      </defs>
+      <path d="M5 8.5l7 7 7-7" filter="url(#cue-glow)" />
+    </svg>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5l7 7 7-7" filter="url(#cue-glow)" /></svg>
   </a>
 </section>
 

@@ -273,8 +273,8 @@ The logo and favicons from the old site are already in place. Until you set the 
   (`soft`) and peach (links you have already visited) are `@theme static` tokens right under it. Orange is reserved
   for links, highlights and the important / warning callouts, so it draws the eye when it appears. The link colors
   (`--link-rest`, `--link-hover`, `--link-press`, `--link-visited`) sit in `:root` further down.
-- Reading experience in articles (`.post-prose` in `global.css`): h2 headings get a gradient `>`, h2 to h4 get a `#`
-  link that copies the section URL, `---` renders as a row of three stars, code blocks get a header bar with the
+- Reading experience in articles (`.post-prose` in `global.css`): h2 headings get a gradient `>`,
+  `---` renders as a row of three stars, code blocks get a header bar with the
   language and a Copy button (`src/lib/codeBlocks.js`; the language comes from a Shiki transformer in
   `src/lib/vault/render.mjs`), and tables are framed and scroll sideways on narrow screens. All of it is plain CSS
   or a small script, so readers without JavaScript still get styled code and tables, just without the header bar.
