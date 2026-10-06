@@ -104,237 +104,266 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 </style>
 
 <script>
-  const link = document.querySelector<HTMLAnchorElement>('[data-warp]');
-  const canvas = document.querySelector<HTMLCanvasElement>('.sky');
-  const ctx = canvas?.getContext('2d');
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  // With the ClientRouter the page is swapped without a reload and this module runs only once, so the animation is set
+  // up from `astro:page-load` (initial load and every navigation) against whichever canvas is on the page right then.
+  let stopPrevious: (() => void) | undefined;
 
-  // `target` is how fast we want to be going: 0 = rest, 1 = warp (hover/focus), 4 = the jump (click).
-  let target = 0;
-  let wake: (() => void) | undefined;
+  function initWarp() {
+    stopPrevious?.();
+    stopPrevious = undefined;
+    const link = document.querySelector<HTMLAnchorElement>('[data-warp]');
+    const canvas = document.querySelector<HTMLCanvasElement>('.sky');
+    const ctx = canvas?.getContext('2d');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 
-  if (canvas && ctx) {
-    const COLORS = ['255 255 255', '255 255 255', '255 255 255', '217 204 255', '191 233 255'];
-    const WARP_COLORS = ['255 255 255', '255 255 255', '255 255 255', '183 156 255', '125 211 252'];
+    // `target` is how fast we want to be going: 0 = rest, 1 = warp (hover/focus), 4 = the jump (click).
+    let target = 0;
+    let wake: (() => void) | undefined;
 
-    // The resting sky: stars that sit still. `r` is the distance from the middle of the screen, `r0` where it lives.
-    // In warp they are flung outwards (along the line from the middle) until they are off the screen. When the warp
-    // ends, the ones that left come back out of the hyperspace point: they fade in halfway between the middle and home,
-    // rush the rest of the way, then brake hard and creep into place (see `settle`).
-    type Rest = {
-      nx: number; ny: number; size: number; alpha: number; c: string; v: number; r: number; pr: number; r0: number; ux: number; uy: number;
-      ret: boolean; // coming home
-      t: number; // seconds since it started coming home (negative = still waiting its turn)
-      d0: number; // how far from home it started (signed)
-      a: number; // fade, 0..1
-    };
-    // The warp field: streaks that only exist while it is on.
-    type Fly = { a: number; r: number; v: number; c: string };
+    if (canvas && ctx) {
+      const COLORS = ['255 255 255', '255 255 255', '255 255 255', '217 204 255', '191 233 255'];
+      const WARP_COLORS = ['255 255 255', '255 255 255', '255 255 255', '183 156 255', '125 211 252'];
 
-    let w = 0;
-    let h = 0;
-    let cx = 0;
-    let cy = 0;
-    let maxR = 1;
-
-    const rand = Math.random;
-    let rest: Rest[] = [];
-    const geometry = () => {
-      for (const s of rest) {
-        const dx = (s.nx - 0.5) * w;
-        const dy = (s.ny - 0.5) * h;
-        s.r0 = Math.hypot(dx, dy) || 1;
-        s.ux = dx / s.r0;
-        s.uy = dy / s.r0;
-      }
-    };
-    const sizeCanvas = () => {
-      const dpr = Math.min(devicePixelRatio || 1, 2);
-      w = innerWidth;
-      h = innerHeight;
-      cx = w / 2;
-      cy = h / 2;
-      maxR = Math.hypot(w, h) / 2;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      geometry();
-      if (!running) for (const s of rest) s.r = s.pr = s.r0; // at rest everything sits at home
-    };
-
-    let running = false;
-    sizeCanvas();
-    rest = Array.from({ length: Math.round(Math.min(260, (w * h) / 6500)) }, () => {
-      const big = rand() < 0.12;
-      return {
-        nx: rand(),
-        ny: rand(),
-        size: big ? 1.1 + rand() * 0.7 : 0.55 + rand() * 0.55,
-        alpha: big ? 0.9 : 0.4 + rand() * 0.5,
-        c: COLORS[Math.floor(rand() * COLORS.length)],
-        v: 0.6 + rand() * 0.9, // depth: how eagerly it leaves
-        r: 0, pr: 0, r0: 1, ux: 0, uy: 0,
-        ret: false, t: 0, d0: 0, a: 1,
+      // The resting sky: stars that sit still. `r` is the distance from the middle of the screen, `r0` where it lives.
+      // In warp they are flung outwards (along the line from the middle) until they are off the screen. When the warp
+      // ends, the ones that left come back out of the hyperspace point: they fade in halfway between the middle and home,
+      // rush the rest of the way, then brake hard and creep into place (see `settle`).
+      type Rest = {
+        nx: number; ny: number; size: number; alpha: number; c: string; v: number; r: number; pr: number; r0: number; ux: number; uy: number;
+        ret: boolean; // coming home
+        t: number; // seconds since it started coming home (negative = still waiting its turn)
+        d0: number; // how far from home it started (signed)
+        a: number; // fade, 0..1
       };
-    });
-    geometry();
-    for (const s of rest) s.r = s.pr = s.r0;
+      // The warp field: streaks that only exist while it is on.
+      type Fly = { a: number; r: number; v: number; c: string };
 
-    const spawn = (anywhere: boolean): Fly => ({
-      a: rand() * Math.PI * 2,
-      r: (anywhere ? rand() : rand() * 0.06) * maxR,
-      v: 0.5 + rand() * 1.1,
-      c: WARP_COLORS[Math.floor(rand() * WARP_COLORS.length)],
-    });
-    const fly: Fly[] = Array.from({ length: Math.round(Math.min(380, (w * h) / 4500)) }, () => spawn(true));
+      let w = 0;
+      let h = 0;
+      let cx = 0;
+      let cy = 0;
+      let maxR = 1;
 
-    let speed = 0;
-    let last = 0;
-
-    // How much of the way home is still to go, `t` seconds after setting off: most of it in a rush, the last bit a crawl.
-    const settle = (t: number) => 0.84 * Math.exp(-12 * t) + 0.16 * Math.exp(-2.4 * t);
-    // The warp is over: stars that are off the screen restart halfway between the middle and home (invisible, each
-    // after its own short wait); the ones still in view just ease back.
-    const release = () => {
-      for (const s of rest) {
-        const x = cx + s.ux * s.r;
-        const y = cy + s.uy * s.r;
-        const gone = x < -12 || x > w + 12 || y < -12 || y > h + 12;
-        if (gone) {
-          s.r = s.r0 * 0.5;
-          s.a = 0;
-          s.t = -Math.random() * 0.22;
-        } else {
-          s.t = 0;
+      const rand = Math.random;
+      let rest: Rest[] = [];
+      const geometry = () => {
+        for (const s of rest) {
+          const dx = (s.nx - 0.5) * w;
+          const dy = (s.ny - 0.5) * h;
+          s.r0 = Math.hypot(dx, dy) || 1;
+          s.ux = dx / s.r0;
+          s.uy = dy / s.r0;
         }
-        s.d0 = s.r - s.r0;
-        s.pr = s.r;
-        s.ret = true;
-      }
-    };
+      };
+      const sizeCanvas = () => {
+        const dpr = Math.min(devicePixelRatio || 1, 2);
+        w = innerWidth;
+        h = innerHeight;
+        cx = w / 2;
+        cy = h / 2;
+        maxR = Math.hypot(w, h) / 2;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        geometry();
+        if (!running) for (const s of rest) s.r = s.pr = s.r0; // at rest everything sits at home
+      };
 
-    const draw = (dt: number) => {
-      if (dt > 0) speed += (target - speed) * (1 - Math.exp(-dt * (target > speed ? 3.2 : 3.4)));
-      ctx.clearRect(0, 0, w, h);
-      ctx.lineCap = 'round';
+      let running = false;
+      sizeCanvas();
+      rest = Array.from({ length: Math.round(Math.min(260, (w * h) / 6500)) }, () => {
+        const big = rand() < 0.12;
+        return {
+          nx: rand(),
+          ny: rand(),
+          size: big ? 1.1 + rand() * 0.7 : 0.55 + rand() * 0.55,
+          alpha: big ? 0.9 : 0.4 + rand() * 0.5,
+          c: COLORS[Math.floor(rand() * COLORS.length)],
+          v: 0.6 + rand() * 0.9, // depth: how eagerly it leaves
+          r: 0, pr: 0, r0: 1, ux: 0, uy: 0,
+          ret: false, t: 0, d0: 0, a: 1,
+        };
+      });
+      geometry();
+      for (const s of rest) s.r = s.pr = s.r0;
 
-      // 1. the resting stars: leaving while the warp is on, gliding home when it is off
-      let away = false;
-      for (const s of rest) {
-        if (dt > 0) {
-          if (target > 0) {
-            s.ret = false;
-            s.a = Math.min(1, s.a + dt * 8);
-            const depth = s.r / maxR;
-            s.r = Math.min(maxR * 1.15, s.r + (60 + speed * 1000 * s.v) * (0.25 + depth * 2.2) * dt);
-          } else if (s.ret) {
-            s.t += dt;
-            if (s.t > 0) {
-              s.a = Math.min(1, s.a + dt * 7); // fades in over the first moments of the rush
-              s.r = s.r0 + s.d0 * settle(s.t);
-              if (s.t > 0.3 && Math.abs(s.r - s.r0) < 0.3) {
-                s.r = s.r0;
-                s.ret = false;
-                s.a = 1;
+      const spawn = (anywhere: boolean): Fly => ({
+        a: rand() * Math.PI * 2,
+        r: (anywhere ? rand() : rand() * 0.06) * maxR,
+        v: 0.5 + rand() * 1.1,
+        c: WARP_COLORS[Math.floor(rand() * WARP_COLORS.length)],
+      });
+      const fly: Fly[] = Array.from({ length: Math.round(Math.min(380, (w * h) / 4500)) }, () => spawn(true));
+
+      let speed = 0;
+      let last = 0;
+
+      // How much of the way home is still to go, `t` seconds after setting off: most of it in a rush, the last bit a crawl.
+      const settle = (t: number) => 0.84 * Math.exp(-12 * t) + 0.16 * Math.exp(-2.4 * t);
+      // The warp is over: stars that are off the screen restart halfway between the middle and home (invisible, each
+      // after its own short wait); the ones still in view just ease back.
+      const release = () => {
+        for (const s of rest) {
+          const x = cx + s.ux * s.r;
+          const y = cy + s.uy * s.r;
+          const gone = x < -12 || x > w + 12 || y < -12 || y > h + 12;
+          if (gone) {
+            s.r = s.r0 * 0.5;
+            s.a = 0;
+            s.t = -Math.random() * 0.22;
+          } else {
+            s.t = 0;
+          }
+          s.d0 = s.r - s.r0;
+          s.pr = s.r;
+          s.ret = true;
+        }
+      };
+
+      const draw = (dt: number) => {
+        if (dt > 0) speed += (target - speed) * (1 - Math.exp(-dt * (target > speed ? 3.2 : 3.4)));
+        ctx.clearRect(0, 0, w, h);
+        ctx.lineCap = 'round';
+
+        // 1. the resting stars: leaving while the warp is on, gliding home when it is off
+        let away = false;
+        for (const s of rest) {
+          if (dt > 0) {
+            if (target > 0) {
+              s.ret = false;
+              s.a = Math.min(1, s.a + dt * 8);
+              const depth = s.r / maxR;
+              s.r = Math.min(maxR * 1.15, s.r + (60 + speed * 1000 * s.v) * (0.25 + depth * 2.2) * dt);
+            } else if (s.ret) {
+              s.t += dt;
+              if (s.t > 0) {
+                s.a = Math.min(1, s.a + dt * 7); // fades in over the first moments of the rush
+                s.r = s.r0 + s.d0 * settle(s.t);
+                if (s.t > 0.3 && Math.abs(s.r - s.r0) < 0.3) {
+                  s.r = s.r0;
+                  s.ret = false;
+                  s.a = 1;
+                }
               }
             }
           }
-        }
-        if (s.r !== s.r0 || s.ret) away = true;
-        if (s.ret && s.t <= 0 && target === 0) {
+          if (s.r !== s.r0 || s.ret) away = true;
+          if (s.ret && s.t <= 0 && target === 0) {
+            s.pr = s.r;
+            continue; // still waiting, nothing to see yet
+          }
+          if (s.r > maxR * 1.1 && target > 0) {
+            s.pr = s.r;
+            continue; // parked off the edge of the screen
+          }
+          const x = cx + s.ux * s.r;
+          const y = cy + s.uy * s.r;
+          const tail = dt > 0 ? Math.max(-260, Math.min(260, ((s.r - s.pr) / dt) * 0.05)) : 0;
           s.pr = s.r;
-          continue; // still waiting, nothing to see yet
+          ctx.strokeStyle = ctx.fillStyle = `rgb(${s.c} / ${(s.alpha * s.a).toFixed(2)})`;
+          if (Math.abs(tail) < 1.5) {
+            ctx.beginPath();
+            ctx.arc(x, y, s.size, 0, Math.PI * 2);
+            ctx.fill();
+          } else {
+            ctx.lineWidth = s.size * 1.6;
+            ctx.beginPath();
+            ctx.moveTo(cx + s.ux * (s.r - tail), cy + s.uy * (s.r - tail));
+            ctx.lineTo(x, y);
+            ctx.stroke();
+          }
         }
-        if (s.r > maxR * 1.1 && target > 0) {
-          s.pr = s.r;
-          continue; // parked off the edge of the screen
+
+        // 2. the warp field itself: fades in with the speed
+        const visible = Math.min(1, speed * 2.2);
+        if (visible > 0.01) {
+          for (const s of fly) {
+            const depth = s.r / maxR; // 0 at the middle, 1 at the corners: things move faster the closer they get
+            s.r += (30 + speed * 900 * s.v) * (0.25 + depth * 2.2) * dt;
+            if (s.r > maxR * 1.05) Object.assign(s, spawn(false));
+            const tail = Math.min(s.r, speed * s.v * (14 + s.r * 0.34)); // the streak lengthens with speed and distance
+            const cos = Math.cos(s.a);
+            const sin = Math.sin(s.a);
+            ctx.strokeStyle = `rgb(${s.c} / ${(Math.min(1, 0.15 + depth * 1.4) * visible).toFixed(3)})`;
+            ctx.lineWidth = 0.7 + depth * 1.7;
+            ctx.beginPath();
+            ctx.moveTo(cx + cos * (s.r - tail), cy + sin * (s.r - tail));
+            ctx.lineTo(cx + cos * s.r, cy + sin * s.r);
+            ctx.stroke();
+          }
         }
-        const x = cx + s.ux * s.r;
-        const y = cy + s.uy * s.r;
-        const tail = dt > 0 ? Math.max(-260, Math.min(260, ((s.r - s.pr) / dt) * 0.05)) : 0;
-        s.pr = s.r;
-        ctx.strokeStyle = ctx.fillStyle = `rgb(${s.c} / ${(s.alpha * s.a).toFixed(2)})`;
-        if (Math.abs(tail) < 1.5) {
-          ctx.beginPath();
-          ctx.arc(x, y, s.size, 0, Math.PI * 2);
-          ctx.fill();
+        return away || target > 0 || speed > 0.005;
+      };
+
+      const frame = (t: number) => {
+        if (!canvas.isConnected) {
+          running = false; // the page has been swapped out
+          return;
+        }
+        const dt = Math.min(0.05, (t - last) / 1000);
+        last = t;
+        if (draw(dt)) {
+          requestAnimationFrame(frame);
         } else {
-          ctx.lineWidth = s.size * 1.6;
-          ctx.beginPath();
-          ctx.moveTo(cx + s.ux * (s.r - tail), cy + s.uy * (s.r - tail));
-          ctx.lineTo(x, y);
-          ctx.stroke();
+          running = false; // everything is home and quiet: stop drawing until the next hover
+          speed = 0;
+          draw(0);
         }
-      }
-
-      // 2. the warp field itself: fades in with the speed
-      const visible = Math.min(1, speed * 2.2);
-      if (visible > 0.01) {
-        for (const s of fly) {
-          const depth = s.r / maxR; // 0 at the middle, 1 at the corners: things move faster the closer they get
-          s.r += (30 + speed * 900 * s.v) * (0.25 + depth * 2.2) * dt;
-          if (s.r > maxR * 1.05) Object.assign(s, spawn(false));
-          const tail = Math.min(s.r, speed * s.v * (14 + s.r * 0.34)); // the streak lengthens with speed and distance
-          const cos = Math.cos(s.a);
-          const sin = Math.sin(s.a);
-          ctx.strokeStyle = `rgb(${s.c} / ${(Math.min(1, 0.15 + depth * 1.4) * visible).toFixed(3)})`;
-          ctx.lineWidth = 0.7 + depth * 1.7;
-          ctx.beginPath();
-          ctx.moveTo(cx + cos * (s.r - tail), cy + sin * (s.r - tail));
-          ctx.lineTo(cx + cos * s.r, cy + sin * s.r);
-          ctx.stroke();
-        }
-      }
-      return away || target > 0 || speed > 0.005;
-    };
-
-    const frame = (t: number) => {
-      const dt = Math.min(0.05, (t - last) / 1000);
-      last = t;
-      if (draw(dt)) {
+      };
+      wake = () => {
+        if (running) return;
+        running = true;
+        last = performance.now();
         requestAnimationFrame(frame);
-      } else {
-        running = false; // everything is home and quiet: stop drawing until the next hover
-        speed = 0;
-        draw(0);
-      }
-    };
-    wake = () => {
-      if (running) return;
-      running = true;
-      last = performance.now();
-      requestAnimationFrame(frame);
-    };
+      };
 
-    draw(0);
-    addEventListener('resize', () => {
-      sizeCanvas();
-      if (!running) draw(0);
-    });
-
-    if (link && !reduce.matches) {
-      const on = () => { if (target < 1) target = 1; wake?.(); };
-      const off = () => {
-        if (target !== 1) return;
+      draw(0);
+      const onResize = () => {
+        sizeCanvas();
+        if (!running) draw(0);
+      };
+      addEventListener('resize', onResize);
+      // coming back with the browser's Back button can restore the page exactly as the jump left it (text faded,
+      // flash on, stars gone): put everything back and let the stars come home
+      const onShow = (e: PageTransitionEvent) => {
+        if (!e.persisted) return;
+        document.body.classList.remove('warp-jump');
         target = 0;
         release();
+        wake?.();
       };
-      link.addEventListener('pointerenter', on);
-      link.addEventListener('focus', on);
-      link.addEventListener('pointerleave', off);
-      link.addEventListener('blur', off);
+      addEventListener('pageshow', onShow);
+      stopPrevious = () => {
+        removeEventListener('resize', onResize);
+        removeEventListener('pageshow', onShow);
+      };
+
+      if (link && !reduce.matches) {
+        const on = () => { if (target < 1) target = 1; wake?.(); };
+        const off = () => {
+          if (target !== 1) return;
+          target = 0;
+          release();
+        };
+        link.addEventListener('pointerenter', on);
+        link.addEventListener('focus', on);
+        link.addEventListener('pointerleave', off);
+        link.addEventListener('blur', off);
+      }
     }
+
+    // "Return to Known Space" makes the jump to lightspeed before it navigates. Anything but a plain left click
+    // (new tab, middle click...) and reduced-motion users go straight there.
+    link?.addEventListener('click', (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (reduce.matches) return;
+      e.preventDefault();
+      target = 4;
+      wake?.();
+      document.body.classList.add('warp-jump');
+      setTimeout(() => (location.href = link.href), 750);
+    });
   }
 
-  // "Return to Known Space" makes the jump to lightspeed before it navigates. Anything but a plain left click
-  // (new tab, middle click...) and reduced-motion users go straight there.
-  link?.addEventListener('click', (e) => {
-    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-    if (reduce.matches) return;
-    e.preventDefault();
-    target = 4;
-    wake?.();
-    document.body.classList.add('warp-jump');
-    setTimeout(() => (location.href = link.href), 750);
-  });
+  document.addEventListener('astro:page-load', initWarp);
 </script>

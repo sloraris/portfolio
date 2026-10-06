@@ -1253,7 +1253,7 @@ hr.slo-hr {
   rotate: 28deg;
   opacity: 0;
   background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.9));
-  filter: drop-shadow(0 0 4px #b79cff);
+  box-shadow: 0 0 6px 1px rgb(183 156 255 / 0.7); /* a box-shadow, not a filter: cheaper to animate */
   animation: hero-shoot 15s linear 4s infinite;
 }
 @keyframes hero-shoot {

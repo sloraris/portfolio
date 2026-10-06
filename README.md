@@ -262,7 +262,7 @@ Everything lives in `public/` and is referenced by URL path in `src/config.ts`.
 | `public/favicon.ico`, `favicon-16x16.png`, `favicon-32x32.png` | Picked up automatically (`.ico`). |
 | `public/apple-touch-icon.png` | 180x180. Picked up automatically if the file exists.                         |
 | `public/android-chrome-*.png`, `site.webmanifest` | Home-screen icons; the manifest is linked automatically. |
-| `public/cosmic.jpg`           | `heroImage: '/cosmic.jpg'` for the home page hero (already set).             |
+| `public/cosmic-hero.webp`     | `heroImage` for the home page hero (already set). It is `cosmic.jpg` pre-blurred and shrunk to 1920px wide (26 KB instead of 674 KB), so the browser does not have to blur it live. The hero shows the image as it is, so blur or shrink a replacement before using it. |
 | `heroQuotes` in `src/config.ts` | The one-liners that scramble into each other on the hero's first line, in random order (the first is shown without JavaScript; one entry = no animation). Click or tap the line for the next one. Keep them to about 27 characters so they fit one line on a phone. |
 
 The logo and favicons from the old site are already in place. Until you set the avatar and hero image, the site shows a gradient avatar placeholder and a CSS starfield.

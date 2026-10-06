@@ -3,6 +3,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ClientRouter } from 'astro:transitions';
 import { SITE } from '../config';
+// The fonts the first screen needs, preloaded so the text does not swap fonts after it has painted.
+import exo2 from '@fontsource-variable/exo-2/files/exo-2-latin-wght-normal.woff2?url';
+import ubuntu400 from '@fontsource/ubuntu/files/ubuntu-latin-400-normal.woff2?url';
+import ubuntu700 from '@fontsource/ubuntu/files/ubuntu-latin-700-normal.woff2?url';
+import ubuntuMono400 from '@fontsource/ubuntu-mono/files/ubuntu-mono-latin-400-normal.woff2?url';
+const preloadFonts = [exo2, ubuntu400, ubuntu700, ubuntuMono400];
 
 interface Props {
   title: string;
@@ -45,4 +51,5 @@ const hasManifest = has('site.webmanifest');
 <meta name="twitter:description" content={description} />
 {ogImage && <meta name="twitter:image" content={ogImage} />}
 
+{preloadFonts.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
 <ClientRouter />
