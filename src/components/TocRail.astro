@@ -10,9 +10,9 @@ const ticks = headings.filter((h) => h.depth <= 3);
 ---
 
 <!--
-  Table-of-contents pill (1280px and up; below that the inline <details> list is used instead).
-  Fixed at the right edge. On wide windows it shares the nav pill's row; on narrower ones it sits just under the
-  nav pill (see global.css), so the two can never overlap.
+  Table-of-contents pill (1280px and up; below that the ToC lives in the nav pill instead, see TopNav).
+  Fixed beside the article. Vertically it follows the nav pill: just under it while the nav is expanded, and on the
+  nav's row while the nav is folded down (see global.css), so the two never overlap.
     open      (page top, hovered, keyboard-focused, or pinned with the button): the full list drops down
     collapsed (scrolling, not pinned):                                         a slim bar of ticks + reading progress
                                                                                (more headings than fit: a window of

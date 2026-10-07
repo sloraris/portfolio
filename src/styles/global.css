@@ -1084,20 +1084,23 @@ hr.slo-hr {
   color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
 }
 
-/* Floats at the right edge, just under the nav pill (so the two can never overlap), from xl up. Same glass look
-   as the nav pill, with a violet edge. Open: the full list. Collapsed: a bar of ticks (one per heading) and the
-   reading progress. */
+/* Floats beside the article (a gap past the right edge of the text column, or the window's right margin on
+   narrower windows), from xl up. Same glass look as the nav pill, with a violet edge. Open: the full list.
+   Collapsed: a bar of ticks (one per heading) and the reading progress. Vertically it follows the nav pill: just
+   under it while the nav is expanded (they can overlap sideways on wide windows, the expanded nav being wider
+   than the text column), and up on the nav's row while the nav is folded down. */
 .toc-pill { display: none; }
 
 @media (min-width: 80rem) {
   .toc-pill {
     --toc-w: 14rem;
+    --toc-gap: 1.5rem; /* between the article column and the pill */
     --toc-top: calc(var(--nav-h) + 0.75rem); /* just under the nav pill while that is expanded ... */
     --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
     position: fixed;
     z-index: 30; /* under the nav pill (z-40) */
     top: var(--toc-top);
-    right: var(--rail-edge);
+    left: min(calc(50% + var(--article-w) / 2 + var(--toc-gap)), calc(100% - var(--rail-edge) - var(--toc-w)));
     width: var(--toc-w);
     max-height: calc(100dvh - var(--toc-top) - var(--rail-edge));
     display: flex;
@@ -1117,11 +1120,6 @@ hr.slo-hr {
   body[data-nav-collapsed] .toc-pill { --toc-top: 0.5rem; transition-delay: 0s, 0.17s; }
   @supports (corner-shape: squircle) {
     .toc-pill { corner-shape: superellipse(1.125); }
-  }
-  /* ... or always, when the window is wide enough that the fully expanded nav pill (52.1rem, centered) cannot
-     reach it. 85rem = nav half-width + gap + the pill + its edge gap, on both sides of center. */
-  @media (min-width: 85rem) {
-    .toc-pill, body[data-nav-collapsed] .toc-pill { --toc-top: 0.5rem; }
   }
   .toc-pill[data-pinned] { border-color: color-mix(in oklab, var(--color-glow) 85%, transparent); }
 

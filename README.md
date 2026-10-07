@@ -189,11 +189,13 @@ CONTENT_DIR=../path/to/your-content-repo pnpm build
   bottom of a page, and while hovered, the pill is fully expanded (Home / Posts / Projects, logo, social icons,
   About). While you scroll it folds down to `3 dots / logo / avatar`; hover it to expand again (on a touch screen,
   tap the 3 dots; it folds away again on the next scroll or a tap elsewhere).
-- **Table of contents pill** (posts and projects with three or more headings): a second pill at the right edge. On
-  windows 1360px and wider it always sits on the nav pill's row. On narrower ones it sits just under the nav pill
-  while that is expanded, slides up onto its row while the nav is folded (scrolling), and slides back down when the
-  nav expands again, so the two can never overlap (`--toc-top`, `--nav-h`, `--rail-edge` in `src/styles/global.css`;
-  `mobileMenu.js` sets `body[data-nav-collapsed]` for it). At the top of
+- **Table of contents pill** (posts and projects with three or more headings): a second pill that floats beside the
+  article, a gap (`--toc-gap`) past the right edge of the text column, or at the window's right margin
+  (`--rail-edge`) when the window is too narrow for that. Vertically it follows the nav pill: it sits just under it
+  while the nav is expanded (on wide windows the expanded nav is wider than the text column, so they would otherwise
+  collide), slides up onto the nav's row while the nav is folded (scrolling), and slides back down when the nav
+  expands again (`--toc-top`, `--nav-h` in `src/styles/global.css`; `mobileMenu.js` sets `body[data-nav-collapsed]`
+  for it). At the top of
   the page it is open and shows the full list. Once you scroll it collapses into a slim bar: one tick per heading
   (passed ones tinted, the one you are reading lit) plus a reading-progress percentage. If there are more headings
   than fit, the bar becomes a window of ticks that slides along as you read, fading out at the edges where more
