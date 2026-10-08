@@ -18,6 +18,8 @@ The build happens on GitHub, checks out **both** repos, and renders every note t
 To publish a post: set `publish: true` in its properties, then run **Obsidian Git: Commit-and-sync**.
 To unpublish: set it to `false` and sync again.
 
+When a post goes live for the first time, the workflow also opens an issue in the content repo with the text to post on LinkedIn (see [LinkedIn drafts](#linkedin-drafts)).
+
 ## What kind of page a note becomes
 
 `publish: true` decides *whether* a note is built. The `type` property decides *what* it becomes. The folder a
@@ -51,9 +53,11 @@ Nothing site-specific is required. A note only needs `publish: true` to become a
 | `description:` (optional)                          | Otherwise the first paragraph.                                                                  |
 | `tags:` (optional)                                 | Tag badges and `/posts/tag/<tag>/` pages (posts only).                                          |
 | `cover:` (optional)                                | Card/hero image, e.g. `cover: "[[my-image.png]]"`.                                              |
+| `ogImage:` (optional)                              | A different image for link previews only (LinkedIn, Slack, ...). Otherwise the cover is used, otherwise a title card is generated. See [Link previews](#link-previews-og-images). |
 | `slug:` (optional)                                 | The last part of the URL (see the table above), default is the filename.                        |
 | `type:` (optional)                                 | `page` or `project`. Leave it out for a post. See [What kind of page a note becomes](#what-kind-of-page-a-note-becomes). |
 | `%% outline or private notes %%`                   | Removed. Inline or multi-line. This is where your outline can live in the same file.            |
+| `%% linkedin` … `%%`                               | Removed from the page like any comment. The text becomes the LinkedIn draft issue, see [LinkedIn drafts](#linkedin-drafts). |
 | `[[Another Note]]`, `[[Note\|alias]]`, `[[Note#H]]` | A link if that note is published, plain text if not (never a dead link).                        |
 | `![[image.png\|describe it\|300]]`                 | Image from the `_attachments` folder next to the note. Middle part is the alt text.             |
 | `![](https://youtu.be/ID)` or `youtube.com/watch`  | Privacy-friendly YouTube embed (supports `&t=1m30s`).                                           |
@@ -250,6 +254,54 @@ Everything except `publish` and `type` is optional. `title`, `date`, `descriptio
 posts. `repo` and `demo` must be `http(s)` URLs, and `writeup` only links to a published note (otherwise it is
 ignored with a warning). Slugs are shared with posts, so a project and a post with the same filename need an
 explicit `slug:` on one of them.
+
+## Link previews (OG images)
+
+When a link to a page is shared (LinkedIn, Slack, Discord, iMessage), the preview picture is `/og/<slug>.jpg`, made at build time by `src/lib/og.mjs`. For every post, project and page it is, in order:
+
+1. `ogImage:` from the note's frontmatter, if set (rarely needed);
+2. the note's `cover`, centre-cropped to 1200x630 and compressed to a JPEG (the full-size cover is only used on the page itself, so keep the important part of a cover near its middle);
+3. otherwise a generated card: the title in Exo 2 over `public/cosmic-hero.webp`, with the site name in the corner (no description, on purpose).
+
+The preview's title and description come from the note's `title` and `description`. Pages that are not notes (home, lists, 404) use `/og-default.jpg`, a card with `author.tagline` from `src/config.ts`.
+
+After publishing, check a new article's card in LinkedIn's Post Inspector (linkedin.com/post-inspector). LinkedIn caches previews, so if you change an image after a link was shared, inspect it again to refresh. `satori` is pinned to 0.34.1 on purpose: 0.35 and later fail with `__dirname is not defined` when imported from an ES module.
+
+## LinkedIn drafts
+
+Write the LinkedIn post in the note itself, in a comment (so it never shows on the site):
+
+```
+%% linkedin
+Hook line.
+
+Two or three lines on why it's worth reading.
+%%
+```
+
+The first time a **post** goes live (not pages or projects), the deploy opens one issue in the **content repo** (private, so a draft is never public before you post it) titled `LinkedIn: <title>`. It holds:
+
+- the post text in a code block (use its copy button; empty block or no block = the title and description, to rewrite),
+- a link to [LinkedIn Preview](https://linkedinpreview.com/dashboard), to paste the text into and see how the post will look,
+- the link, to paste at the end or in the first comment,
+- the preview card, so you can see what LinkedIn will show.
+
+Post it on LinkedIn by hand, then close the issue. An open `linkedin-draft` issue means "not posted yet".
+
+How it works (`scripts/linkedin-drafts.mjs`, `src/lib/linkedin.mjs`, the `linkedin-drafts` job in `deploy.yml`):
+
+1. **Before** the deploy, the build compares its posts with the live site's `sitemap-0.xml`. The ones the live site doesn't have are the new posts. If the live sitemap can't be read (the very first deploy of this site, or a network hiccup) nothing counts as new, so you never get one issue per old post.
+2. **After** a successful deploy, a separate job reads each new post's `%% linkedin %%` block from the content repo and opens the issues. Only this job has the token, and it prints no draft text (the logs of this repo are public).
+3. One issue per slug, ever: the issue carries a hidden marker, and a slug that already has an issue (open or closed) is skipped. Changing a post's `slug` makes it a new post. If the job fails (an expired token, say), use **Re-run failed jobs** on the run: it keeps the list of new posts from the original run, and the marker prevents duplicates.
+
+### One-time setup
+
+1. **Content repo > Settings > General > Features**: make sure **Issues** is ticked.
+2. **Create a token** (GitHub > Settings > Developer settings > Personal access tokens > Fine-grained tokens): resource owner = you, **Only select repositories** = the content repo, permission **Issues: Read and write** (Metadata read-only is added automatically), and nothing else. Set the longest expiry and put the renewal date in your calendar.
+3. **Site repo > Settings > Secrets and variables > Actions > New repository secret**: name `CONTENT_REPO_ISSUES_TOKEN`, value = the token. Until it exists the job skips itself with a notice; the deploy is not affected.
+4. **Notifications**: the token acts as you, and GitHub normally doesn't notify you about your own activity. If the first issue arrives without an email or push, look for an option like **Include your own updates** under Settings > Notifications (Email) and turn it on. Open issues also show in the Issues tab of the GitHub mobile app.
+5. Add the empty `%% linkedin %%` block to your Article template (the copy in `docs/content-repo/templates/Article.md` is the reference).
+6. **Test it once**: publish a throwaway post, wait for the deploy, check that the issue appears (and that the preview card renders), then unpublish the post and close the issue.
 
 ## Where your images go
 

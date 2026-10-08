@@ -132,6 +132,7 @@ export async function buildPosts(contentDir, { publicDir = path.resolve('public'
       updated: coerceDate(fm.updated ?? fm.modified ?? fm.lastmod) ?? undefined,
       tags: normalizeTags(fm.tags ?? fm.tag),
       cover: resolveCover(note, fm.cover ?? fm.image ?? fm.heroImage ?? fm.banner),
+      ogImage: resolveCover(note, fm.ogImage ?? fm['og-image']),
       readingTime: rendered.readingTime,
       headings: rendered.headings,
       html: rendered.html,

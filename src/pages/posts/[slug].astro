@@ -14,7 +14,7 @@ const { data } = Astro.props.post;
 const showToc = data.headings.filter((h) => h.depth <= 3).length >= 3;
 ---
 
-<BaseLayout title={data.title} description={data.description} image={data.cover} ogType="article" layout="article" toc={showToc ? data.headings : undefined}>
+<BaseLayout title={data.title} description={data.description} image={`/og/${data.slug}.jpg`} ogType="article" layout="article" toc={showToc ? data.headings : undefined}>
   <article class="min-w-0">
     {data.cover && <img src={data.cover} alt="" class="w-full mb-6 rounded-xl aspect-video object-cover" />}
     <h1 class="text-4xl font-bold my-2">{data.title}</h1>

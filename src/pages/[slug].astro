@@ -39,7 +39,7 @@ const { data } = Astro.props.page;
 // pass `toc={data.headings}` to BaseLayout plus <TocRail> in its `aside` slot, the way posts/[slug].astro does.
 ---
 
-<BaseLayout title={data.title} description={data.description} image={data.cover} layout="article">
+<BaseLayout title={data.title} description={data.description} image={'source' in data ? `/og/${data.slug}.jpg` : undefined} layout="article">
   <article class="min-w-0">
     {data.cover && <img src={data.cover} alt="" class="w-full mb-6 rounded-xl aspect-video object-cover" />}
     <h1 class="text-4xl font-bold my-2">{data.title}</h1>

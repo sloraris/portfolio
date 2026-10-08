@@ -21,7 +21,7 @@ interface Props {
   toc?: { depth: number; id: string; text: string }[];
 }
 
-const { title = SITE.title, description = SITE.description, image, ogType, layout = 'wide', toc } = Astro.props;
+const { title = SITE.title, description = SITE.description, image = '/og-default.jpg', ogType, layout = 'wide', toc } = Astro.props;
 const hasAside = Astro.slots.has('aside');
 
 // A faint, static starfield fixed behind the whole site: sparse and dim, so it reads as depth rather than decoration.

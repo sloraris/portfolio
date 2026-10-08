@@ -31,6 +31,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    outputs:
+      # posts that are not on the live site yet: [{slug,title,description}], or [] (all public information)
+      new_posts: ${{ steps.new-posts.outputs.new_posts }}
     steps:
       # Fail early with a readable message instead of a cryptic checkout error.
       - name: Check the content repo is configured
@@ -79,6 +82,16 @@ jobs:
         env:
           CONTENT_DIR: content
 
+      # Compares the posts in dist/ with the ones on the live site (this runs before the deploy, so the live site
+      # is still the old one). It never fails the build; see scripts/linkedin-drafts.mjs.
+      - name: Find the posts that are not live yet
+        id: new-posts
+        run: node scripts/linkedin-drafts.mjs detect
+        env:
+          SITE_URL: https://sloraris.dev # keep in sync with `site` in astro.config.mjs
+          SITE_TITLE: sloraris # SITE.title in src/config.ts
+        continue-on-error: true
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
@@ -95,3 +108,61 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  # After a successful deploy: one issue per new post in the private content repo, holding the text to post on
+  # LinkedIn. It is its own job so the issues token never exists in the job that builds the site.
+  linkedin-drafts:
+    needs: [build, deploy]
+    if: needs.build.outputs.new_posts != '' && needs.build.outputs.new_posts != '[]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      # Until the secret exists, skip quietly instead of turning every deploy red.
+      - name: Check the issues token is configured
+        id: configured
+        env:
+          TOKEN_IS_SET: ${{ secrets.CONTENT_REPO_ISSUES_TOKEN != '' }}
+        run: |
+          echo "enabled=$TOKEN_IS_SET" >> "$GITHUB_OUTPUT"
+          if [ "$TOKEN_IS_SET" != "true" ]; then
+            echo "::notice title=LinkedIn drafts skipped::Set the repository secret CONTENT_REPO_ISSUES_TOKEN to get a draft issue for each new post. See 'LinkedIn drafts' in the README."
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.configured.outputs.enabled == 'true'
+        with:
+          persist-credentials: false
+
+      - name: Check out the content repo
+        if: steps.configured.outputs.enabled == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.CONTENT_REPO }}
+          token: ${{ secrets.CONTENT_REPO_TOKEN }}
+          path: content
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@v4
+        if: steps.configured.outputs.enabled == 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.configured.outputs.enabled == 'true'
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+        if: steps.configured.outputs.enabled == 'true'
+
+      # Never prints the draft text: the logs of this repo are public. NEW_POSTS goes in through `env`, never
+      # into the shell command, so a title can't be interpreted as code.
+      - name: Open the draft issues
+        if: steps.configured.outputs.enabled == 'true'
+        run: node scripts/linkedin-drafts.mjs create
+        env:
+          NEW_POSTS: ${{ needs.build.outputs.new_posts }}
+          CONTENT_DIR: content
+          ISSUE_REPO: ${{ vars.CONTENT_REPO }}
+          GH_TOKEN: ${{ secrets.CONTENT_REPO_ISSUES_TOKEN }}
+          SITE_URL: https://sloraris.dev # keep in sync with `site` in astro.config.mjs

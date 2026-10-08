@@ -13,6 +13,7 @@
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.4",
     "@fontsource-variable/exo-2": "^5.3.0",
+    "@fontsource/exo-2": "^5.3.0",
     "@fontsource/ubuntu": "^5.3.0",
     "@fontsource/ubuntu-mono": "^5.3.0",
     "@shikijs/rehype": "^4.5.0",
@@ -30,6 +31,8 @@
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
+    "satori": "0.34.1",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4.3.3",
     "unified": "^11.0.5",
     "unist-util-visit": "^5.1.0"

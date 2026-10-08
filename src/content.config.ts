@@ -16,6 +16,7 @@ const posts = defineCollection({
     updated: z.date().optional(),
     tags: z.array(z.string()),
     cover: z.string().optional(),
+    ogImage: z.string().optional(), // optional override for the link preview; otherwise the cover, otherwise a generated card
     readingTime: z.number(),
     headings: z.array(z.object({ depth: z.number(), id: z.string(), text: z.string() })),
     html: z.string(),
