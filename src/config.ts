@@ -12,49 +12,6 @@ export const SITE = {
   // null = built-in placeholder
   logo: '/logo.svg' as string | null,
   heroImage: '/cosmic-hero.webp' as string | null,
-  // The one-liners that decode themselves on the home hero's first line, in random order. The first one is shown
-  // before (and without) any script; a single entry just shows it. Keep them short (about 27 characters or fewer)
-  // so they fit on one line on a phone.
-  heroQuotes: [
-    // A sysadmin, probably
-    'Hello, world.',
-    "I'm in.",
-    "It's always DNS.",
-    'Trust, but verify.',
-    'Uptime is a feature.',
-    'Works on my machine.',
-    'Turn it off and on again.',
-    "'sudo' make me a sandwich.",
-    // Star Trek
-    'Make it so.',
-    'Resistance is futile.',
-    // Star Wars
-    "It's working!",
-    "Don't panic.",
-    'Stay on target.',
-    'Never tell me the odds.',
-    "Those WERE the droids I was looking for...",
-    "You are being rescued. Please do not resist.",
-    // Cars
-    "Float like a Cadillac, sting like a Beamer.",
-    "I'm the world's best backwards driver!",
-    "I'm confused...",
-    // Robots
-    "I'd smack ya if I had a hand.",
-    // Pirates of the Caribbean
-    "Why is the rum always gone?",
-    // Lego Batman
-    "FIRST TRY.",
-    // How to Train Your Dragon
-    "Thank you for nothing, you useless reptile.",
-    // Psych
-    "Don't be exactly half of an 11lb black forest ham.",
-    "You heard about Pluto? That's messed up right?",
-    // Spiderverse
-    "It's that easy.",
-    // Helldivers 2
-    "Join, the Helldivers.",
-  ] as string[],
 
   // Shown in the nav pill's About button and in the author box at the end of every post, page and project.
   author: {

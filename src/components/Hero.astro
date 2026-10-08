@@ -1,13 +1,20 @@
 ---
 import { SITE } from '../config';
 import { sky } from '../lib/sky';
+import { getPages } from '../lib/content';
+import { QUOTES_SLUG, heroQuotesFrom } from '../lib/quotes.mjs';
 
 interface Props {
   /** id of the first section below the hero (recent projects / posts): the arrow at the bottom points and scrolls there */
   target: string;
 }
 const { target } = Astro.props;
-const quotes = SITE.heroQuotes;
+// The quote machine's lines are the list on the published `quotes` page (a note with `type: page`, `slug: quotes`,
+// kept unlisted, see src/lib/unlisted.mjs): one list to maintain. Without that page the line is just "Hello, world!".
+// The same page is the easter egg the line links to for someone who sits and watches or clicks a lot.
+const quotesNote = (await getPages()).find((p) => p.data.slug === QUOTES_SLUG);
+const quotes = heroQuotesFrom(quotesNote);
+const quotesPage = quotesNote ? `/${QUOTES_SLUG}/` : '';
 
 // Three layers of stars (see src/lib/sky.ts); positioned in cqw/cqh of .hero-bg, so the sky scales with the hero.
 const skyFine = sky(46, 7, ['#fff', '#fff', '#d9ccff'], 0);
@@ -36,7 +43,7 @@ const skyGlow = sky(7, 99, ['#b79cff', '#7dd3fc', '#ffd9bf'], 3);
     <p class="hero-eyebrow" data-pending aria-hidden="true">
       <span class="hero-line">
         <span class="hero-prompt">&gt;</span>
-        <span class="hero-typed" data-quotes={JSON.stringify(quotes)}>{quotes[0]}</span><span class="hero-caret"></span>
+        <span class="hero-typed" data-quotes={JSON.stringify(quotes)} data-more={quotesPage}>{quotes[0]}</span><span class="hero-caret"></span>
       </span>
     </p>
     <h1 id="hero-title" class="hero-title hero-copy hero-rise" style="--d: 120ms">
@@ -115,7 +122,11 @@ const skyGlow = sky(7, 99, ['#b79cff', '#7dd3fc', '#ffd9bf'], 3);
       if (words.length <= 1) reveal();
       if (words.length > 1) {
         let onScreen = true;
-        new IntersectionObserver(([entry]) => (onScreen = entry.isIntersecting)).observe(hero);
+        let leftHero = false; // scrolled down to the content at some point: no need to point there any more
+        new IntersectionObserver(([entry]) => {
+          onScreen = entry.isIntersecting;
+          if (!onScreen) leftHero = true;
+        }).observe(hero);
 
         const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
         // do not type to nobody: hold while the tab is hidden or the hero has scrolled away
@@ -158,7 +169,7 @@ const skyGlow = sky(7, 99, ['#b79cff', '#7dd3fc', '#ffd9bf'], 3);
         // Every quote turns up once before any repeats, and never the same one twice in a row. What has been shown this
         // round is remembered by the quote's own text, and kept in the browser: across page loads and navigations, and
         // quotes added to (or removed from) the config later simply count as not shown yet.
-        type Round = { seen: string[]; last: string };
+        type Round = { seen: string[]; last: string; recent?: string[] };
         const KEY = 'sloraris-hero-quotes';
         const load = (): Round => {
           try {
@@ -179,30 +190,102 @@ const skyGlow = sky(7, 99, ['#b79cff', '#7dd3fc', '#ffd9bf'], 3);
         };
         const next = () => {
           let round = load();
-          let left = words.filter((w, i) => !round.seen.includes(w) && w !== round.last && words.indexOf(w) === i);
+          const fresh = (w: string, i: number) => words.indexOf(w) === i && w !== round.last;
+          let left = words.filter((w, i) => fresh(w, i) && !round.seen.includes(w));
           if (!left.length) {
-            // round complete: start a new one (only the last quote shown is held back, so it cannot come twice running)
-            round = { seen: [], last: round.last };
-            left = words.filter((w, i) => w !== round.last && words.indexOf(w) === i);
+            // round complete: start a new one (the last quote shown still cannot come twice running)
+            round = { seen: [], last: round.last, recent: round.recent };
+            left = words.filter(fresh);
           }
-          const pick = left[Math.floor(Math.random() * left.length)] ?? words[0];
-          save({ seen: [...round.seen, pick].filter((w) => words.includes(w)), last: pick });
+          // The last few quotes shown sit out for a while, so one from the end of a round cannot come straight back at
+          // the start of the next (unless that is all that is left).
+          const rested = left.filter((w) => !(round.recent ?? []).includes(w));
+          const pool = rested.length ? rested : left;
+          const pick = pool[Math.floor(Math.random() * pool.length)] ?? words[0];
+          const hold = Math.min(5, Math.floor(words.length / 3));
+          save({
+            seen: [...round.seen, pick].filter((w) => words.includes(w)),
+            last: pick,
+            recent: [...(round.recent ?? []), pick].slice(-hold),
+          });
           return words.indexOf(pick);
         };
 
+        // Quiet extras, each at most once per visit to the page:
+        //  - someone who just sits and watches for a minute gets a hint that the quotes can be clicked;
+        //  - someone who clicks through 20 of them gets a "quote" that is only a link, "Click Here", to the quotes
+        //    page (when there is one). No context on purpose: whoever is curious enough finds out, and whoever does
+        //    not click it just sees the machine carry on after a short pause.
+        //  - and so nobody loses an afternoon to the quote machine: after a minute and a half on the hero it suggests
+        //    having a look at a project or a post, and after two and a half it says enough, then scrolls down to
+        //    them (the same scroll as the arrow at the bottom of the hero). Anyone who has already scrolled down is
+        //    left alone.
+        // `watched` counts the seconds the line was actually in view since the last click; `here` the same, never reset.
+        const HINT_AFTER = 60; // seconds
+        const REMIND_AFTER = 90;
+        const PUSH_AFTER = 150;
+        const EGG_CLICKS = 20;
+        const HINT = 'You can click these quotes to go faster';
+        const EGG = 'Click Here';
+        const REMIND = 'Enjoying the quotes? Go take a look at a project or a post.';
+        const PUSH = "Okay, that's enough. Go look at the good stuff.";
+        const cue = hero.querySelector<HTMLElement>('.hero-cue');
+        const MORE = typed.dataset.more ?? '';
+        let watched = 0;
+        let here = 0;
+        let clicks = 0;
+        let hinted = false;
+        let egged = false;
+        let reminded = false;
+        let pushed = false;
+        const watcher = setInterval(() => {
+          if (!typed.isConnected) clearInterval(watcher);
+          else if (!document.hidden && onScreen) {
+            watched++;
+            here++;
+          }
+        }, 1000);
+
         let text = words[0];
         let timer: ReturnType<typeof setTimeout> | undefined;
-        const show = async (i: number) => {
+        // a quote (by index), or one of the extras in its place
+        const show = async (i: number, extra?: 'hint' | 'egg' | 'remind' | 'push') => {
           clearTimeout(timer);
           if (!typed.isConnected) return; // the page was swapped out by a navigation
           const id = ++latest;
           const from = typed.textContent ?? text; // whatever is on screen right now, even half-scrambled
-          text = words[i];
+          text = extra === 'hint' ? HINT : extra === 'egg' ? EGG : extra === 'remind' ? REMIND : extra === 'push' ? PUSH : words[i];
           caret.dataset.typing = '';
           await decode(from, text, id);
           if (id !== latest) return;
           delete caret.dataset.typing;
-          timer = setTimeout(() => show(next()), 2200 + text.length * 60); // longer lines get a little longer to be read
+          if (extra === 'egg') {
+            const a = document.createElement('a');
+            a.href = MORE; // an ordinary link: the page opens through the router, like any other
+            a.tabIndex = -1; // the whole line is decorative and hidden from assistive tech
+            a.textContent = EGG;
+            typed.replaceChildren(a);
+          }
+          if (extra === 'push') {
+            // let them read it, then take them there (unless they have gone on their own in the meantime)
+            await wait(1400);
+            if (id === latest && typed.isConnected && onScreen && !document.hidden) cue?.click();
+          }
+          // longer lines get a little longer to be read; the extras come up when their time has, once each
+          const dwell = extra === 'egg' ? 6000 : 2200 + text.length * 60;
+          timer = setTimeout(() => {
+            const canPoint = !leftHero && !!cue;
+            if (canPoint && !pushed && here >= PUSH_AFTER) {
+              pushed = reminded = true;
+              show(0, 'push');
+            } else if (canPoint && !reminded && here >= REMIND_AFTER) {
+              reminded = true;
+              show(0, 'remind');
+            } else if (!hinted && !clicks && watched >= HINT_AFTER) {
+              hinted = true;
+              show(0, 'hint');
+            } else show(next());
+          }, dwell);
         };
 
         // First load: wait for the page (hero image included) and an idle moment, then a beat for the headline to land.
@@ -222,7 +305,15 @@ const skyGlow = sky(7, 99, ['#b79cff', '#7dd3fc', '#ffd9bf'], 3);
         });
 
         // click (or tap) the line for the next quote straight away
-        eyebrow?.addEventListener('click', () => show(next()));
+        eyebrow?.addEventListener('click', (e) => {
+          if ((e.target as Element).closest('a')) return; // the link goes to its page, not to the next quote
+          watched = 0; // someone clicking along is not just sitting there
+          clicks++;
+          if (MORE && !egged && clicks >= EGG_CLICKS) {
+            egged = true;
+            show(0, 'egg');
+          } else show(next());
+        });
       }
     }
   }

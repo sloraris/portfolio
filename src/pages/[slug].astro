@@ -3,6 +3,7 @@
 import { getPages } from '../lib/content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../config';
+import { UNLISTED_PAGES } from '../lib/unlisted.mjs';
 
 export async function getStaticPaths() {
   // (getStaticPaths runs on its own: it can use imports, but not variables declared outside it)
@@ -38,7 +39,7 @@ const { data } = Astro.props.page;
 // pass `toc={data.headings}` to BaseLayout plus <TocRail> in its `aside` slot, the way posts/[slug].astro does.
 ---
 
-<BaseLayout title={data.title} description={data.description} image={'source' in data ? `/og/${data.slug}.jpg` : undefined} layout="article">
+<BaseLayout title={data.title} description={data.description} image={'source' in data ? `/og/${data.slug}.jpg` : undefined} layout="article" noindex={UNLISTED_PAGES.includes(data.slug)}>
   <article class="min-w-0">
     {data.cover && <img src={data.cover} alt="" class="w-full mb-6 rounded-xl aspect-video object-cover" />}
     <h1 class="text-4xl font-bold my-2">{data.title}</h1>

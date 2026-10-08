@@ -11,6 +11,8 @@ interface Props {
   description?: string;
   image?: string;
   ogType?: string;
+  /** ask search engines to skip this page (unlisted pages, see src/lib/unlisted.mjs) */
+  noindex?: boolean;
   /**
    * wide    - content (home, lists)
    * article - CENTERED article + floating table-of-contents pill via <Fragment slot="aside">
@@ -21,7 +23,7 @@ interface Props {
   toc?: { depth: number; id: string; text: string }[];
 }
 
-const { title = SITE.title, description = SITE.description, image = '/og-default.jpg', ogType, layout = 'wide', toc } = Astro.props;
+const { title = SITE.title, description = SITE.description, image = '/og-default.jpg', ogType, noindex, layout = 'wide', toc } = Astro.props;
 const hasAside = Astro.slots.has('aside');
 
 // A faint, static starfield fixed behind the whole site: sparse and dim, so it reads as depth rather than decoration.
@@ -36,7 +38,7 @@ const stars = [
 <!doctype html>
 <html lang="en" data-theme="sloraris">
   <head>
-    <BaseHead title={title} description={description} image={image} ogType={ogType} />
+    <BaseHead title={title} description={description} image={image} ogType={ogType} noindex={noindex} />
   </head>
   <body>
     <div class="page-stars" aria-hidden="true">

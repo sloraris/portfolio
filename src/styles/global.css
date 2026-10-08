@@ -1390,6 +1390,8 @@ hr.slo-hr {
 .hero-line { display: block; text-wrap: balance; }
 .hero-prompt { color: var(--color-soft); margin-right: 0.6ch; }
 .hero-typed { transition: color 0.35s ease; }
+.hero-typed a { font: inherit; letter-spacing: inherit; color: var(--link-rest); text-decoration: underline; text-underline-offset: 0.2em; transition: color 0.15s; }
+.hero-typed a:hover { color: var(--link-hover); }
 .hero-typed[data-decoding] { color: var(--color-secondary); transition: none; } /* cyan while it scrambles, then it locks in */
 .hero-caret {
   display: inline-block;
