@@ -71,6 +71,9 @@ const skyGlow = sky(7, 99, ['#b79cff', '#7dd3fc', '#ffd9bf'], 3);
 <script>
   // With the ClientRouter the page is swapped without a reload and this module runs only once, so everything is set
   // up from `astro:page-load` (initial load and every navigation) against whichever hero is on the page right then.
+  // survives client navigations even when localStorage is not available
+  let memory = { seen: [] as string[], last: '' };
+
   function initHero() {
     const hero = document.querySelector<HTMLElement>('.hero');
     const typed = document.querySelector<HTMLElement>('.hero-typed');
@@ -152,17 +155,39 @@ const skyGlow = sky(7, 99, ['#b79cff', '#7dd3fc', '#ffd9bf'], 3);
           delete typed.dataset.decoding;
         };
 
-        // a shuffled bag, so every quote turns up once before any repeats, and never the same one twice in a row
-        const shuffled = (skip: number) =>
-          words
-            .map((_, i) => i)
-            .filter((i) => i !== skip)
-            .sort(() => Math.random() - 0.5);
-        let current = 0;
-        let bag = shuffled(0); // the quote on screen has had its turn
+        // Every quote turns up once before any repeats, and never the same one twice in a row. What has been shown this
+        // round is remembered by the quote's own text, and kept in the browser: across page loads and navigations, and
+        // quotes added to (or removed from) the config later simply count as not shown yet.
+        type Round = { seen: string[]; last: string };
+        const KEY = 'sloraris-hero-quotes';
+        const load = (): Round => {
+          try {
+            const r = JSON.parse(localStorage.getItem(KEY) ?? '');
+            if (Array.isArray(r.seen) && typeof r.last === 'string') return r;
+          } catch {
+            /* nothing stored, or storage is blocked */
+          }
+          return memory;
+        };
+        const save = (r: Round) => {
+          memory = r;
+          try {
+            localStorage.setItem(KEY, JSON.stringify(r));
+          } catch {
+            /* the round then lasts until the next full page load */
+          }
+        };
         const next = () => {
-          if (!bag.length) bag = shuffled(current);
-          return bag.pop() as number;
+          let round = load();
+          let left = words.filter((w, i) => !round.seen.includes(w) && w !== round.last && words.indexOf(w) === i);
+          if (!left.length) {
+            // round complete: start a new one (only the last quote shown is held back, so it cannot come twice running)
+            round = { seen: [], last: round.last };
+            left = words.filter((w, i) => w !== round.last && words.indexOf(w) === i);
+          }
+          const pick = left[Math.floor(Math.random() * left.length)] ?? words[0];
+          save({ seen: [...round.seen, pick].filter((w) => words.includes(w)), last: pick });
+          return words.indexOf(pick);
         };
 
         let text = words[0];
@@ -172,7 +197,6 @@ const skyGlow = sky(7, 99, ['#b79cff', '#7dd3fc', '#ffd9bf'], 3);
           if (!typed.isConnected) return; // the page was swapped out by a navigation
           const id = ++latest;
           const from = typed.textContent ?? text; // whatever is on screen right now, even half-scrambled
-          current = i;
           text = words[i];
           caret.dataset.typing = '';
           await decode(from, text, id);
@@ -194,7 +218,7 @@ const skyGlow = sky(7, 99, ['#b79cff', '#7dd3fc', '#ffd9bf'], 3);
           typed.textContent = '';
           reveal();
           await wait(350); // the line fades in, then the quote starts decoding
-          if (latest === 0) show(0);
+          if (latest === 0) show(next());
         });
 
         // click (or tap) the line for the next quote straight away
