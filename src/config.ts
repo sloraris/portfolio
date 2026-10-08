@@ -49,8 +49,11 @@ export const SITE = {
     "Thank you for nothing, you useless reptile.",
     // Psych
     "Don't be exactly half of an 11lb black forest ham.",
+    "You heard about Pluto? That's messed up right?",
     // Spiderverse
     "It's that easy.",
+    // Helldivers 2
+    "Join, the Helldivers.",
   ] as string[],
 
   // Shown in the nav pill's About button and in the author box at the end of every post, page and project.

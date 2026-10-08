@@ -415,6 +415,10 @@ hr.slo-hr {
     max-width: none;
     flex-direction: row;
     overflow: visible; /* so the social hover glow is not clipped */
+    /* a true stadium, so its ends are concentric with the buttons' (also full-round) ends: 6px of padding all the
+       way round the curve. The small-screen radius (with its squircle corners) left the ends flatter than the buttons. */
+    border-radius: 9999px;
+    corner-shape: round;
   }
   .nav-bar {
     display: grid;
@@ -465,6 +469,12 @@ hr.slo-hr {
     transition: width 0.34s var(--ease), background-color 0.15s, box-shadow 0.15s, scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .nav-link:hover { scale: 1.05; }
+  /* The two buttons at the ends of the pill grow about the centre of the pill's curve (the centre of their own end
+     circle), not about their middle: that keeps them concentric with the border, where growing from the middle pushed
+     the outer end toward it. A touch less (1.04) so the inner end does not reach the neighbouring 4px gap either. */
+  .nav-side--left li:first-child .nav-link { transform-origin: calc(var(--btn-h) / 2) 50%; }
+  .nav-about { transform-origin: calc(100% - var(--btn-h) / 2) 50%; }
+  .nav-side--left li:first-child .nav-link:hover, .nav-about:hover { scale: 1.04; }
   /* Home / Posts / Projects share one violet tone, like the menu tiles on small screens.
      Hovered: a tint of it; current page: the tint plus a ring (not clickable). */
   .nav-link--tone { --tone: var(--color-glow); }
@@ -583,7 +593,7 @@ hr.slo-hr {
 
 @media (prefers-reduced-motion: reduce) {
   .nav-panel, .nav-toc-panel, .nav-toc-btn, .nav-toc-chevron, .nav-tile, .nav-about-tile, .nav-panel-social, .nav-ham path, .nav-link, .nav-link-label, .nav-glyph, .nav-dot, .nav-social, .nav-social-icons, .nav-side, .nav-dots { transition: none !important; }
-  .nav-link:hover, .nav-tile:hover, .nav-about-tile:hover, .nav-toggle:hover { scale: none; }
+  .nav-link:hover, .nav-tile:hover, .nav-about-tile:hover, .nav-toggle:hover { scale: none !important; }
 }
 
 /*------------------- Social links: hover -------------------*/
