@@ -2,6 +2,7 @@
 // Standalone pages (About, etc.): notes with `type: page`. They live at /<slug>/.
 import { getPages } from '../lib/content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import DraftBanner from '../components/DraftBanner.astro';
 import { SITE } from '../config';
 import { UNLISTED_PAGES } from '../lib/unlisted.mjs';
 
@@ -41,6 +42,7 @@ const { data } = Astro.props.page;
 
 <BaseLayout title={data.title} description={data.description} image={'source' in data ? `/og/${data.slug}.jpg` : undefined} layout="article" noindex={UNLISTED_PAGES.includes(data.slug)}>
   <article class="min-w-0">
+    {data.draft && <DraftBanner />}
     {data.cover && <img src={data.cover} alt="" class="w-full mb-6 rounded-xl aspect-video object-cover" />}
     <h1 class="text-4xl font-bold my-2">{data.title}</h1>
     <hr class="slo-static-hr my-4" />

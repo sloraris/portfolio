@@ -21,6 +21,7 @@ const posts = defineCollection({
     headings: z.array(z.object({ depth: z.number(), id: z.string(), text: z.string() })),
     html: z.string(),
     source: z.string(),
+    draft: z.boolean().optional(), // dev server only: an unpublished note shown by `pnpm dev:drafts`
     // Project-only (type: project); absent on posts and pages. See projectFields() in lib/vault/posts.mjs.
     status: z.enum(['active', 'finished', 'archived']).optional(),
     featured: z.boolean().optional(),

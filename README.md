@@ -175,12 +175,28 @@ CONTENT_DIR=../path/to/your-content-repo pnpm build
 `CONTENT_DIR` is the folder the notes are read from. Set it inline like above; if it isn't set, the default is
 `./content` inside this repo, which is git-ignored so a dev vault kept there is never committed.
 `pnpm dev` watches the vault: save a note in Obsidian and the page updates.
+
+### Previewing unpublished notes
+
+```sh
+CONTENT_DIR=../path/to/your-content-repo pnpm dev:drafts
+```
+
+Same dev server, but every note in the vault is rendered whatever its `publish` value is, so you can check the
+formatting of a post or project before it goes live. Each one is marked with a **Draft** badge in the lists and a
+banner on its page. Their type still decides where they land (`/posts/`, `/projects/`, `/<slug>/`).
+
+It can't leak into the live site: it needs `SHOW_DRAFTS=1`, the dev server's file watcher (`astro build` never
+has one) and no `CI` variable. Even with `SHOW_DRAFTS` set, `pnpm build` and the deploy workflow publish only
+`publish: true` notes. A draft whose slug is already taken by another note is skipped with a warning (set `slug:`).
+Images used by drafts are copied to `public/media/` like any others; that folder is git-ignored, and CI builds on a
+fresh checkout.
 `test/fixtures/vault` is a small fake vault that exercises every feature above.
 
 ## Things worth knowing
 
 - **A missing content directory fails the build** on purpose, so a broken checkout can never deploy an empty site.
-- **Unpublished notes are never read into the output.** Attachments are only copied if a *published* note uses them,
+- **Unpublished notes are never read into the output** (the local `pnpm dev:drafts` preview is the one exception, and it never runs in a build). Attachments are only copied if a *published* note uses them,
   and anything outside the vault folder is refused.
 - **CI logs may be public**, so in CI the build warnings do not name unpublished notes.
 - Two published notes with the same slug fail the build; set `slug:` on one of them.

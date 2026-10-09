@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "astro dev",
+    "dev:drafts": "SHOW_DRAFTS=1 astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "test": "node --test \"test/**/*.test.mjs\""

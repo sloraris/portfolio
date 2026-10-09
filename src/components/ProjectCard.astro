@@ -31,7 +31,10 @@ const archived = status === 'archived';
       <h2 class="text-xl font-bold">
         <a href={projectHref(data.slug)} class="after:absolute after:inset-0 focus-visible:outline-none">{data.title}</a>
       </h2>
-      {status !== 'active' && <span class="badge badge-outline badge-sm capitalize shrink-0 mt-1">{status}</span>}
+      <div class="flex gap-1 shrink-0 mt-1">
+        {data.draft && <span class="badge badge-warning badge-sm">Draft</span>}
+        {status !== 'active' && <span class="badge badge-outline badge-sm capitalize">{status}</span>}
+      </div>
     </div>
 
     {data.description && <p class="py-1 grow">{data.description}</p>}

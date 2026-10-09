@@ -91,8 +91,11 @@ function projectFields(note, vault, warn) {
   };
 }
 
-export async function buildPosts(contentDir, { publicDir = path.resolve('public'), warn = console.warn } = {}) {
-  const vault = scanVault(contentDir, { warn });
+export async function buildPosts(
+  contentDir,
+  { publicDir = path.resolve('public'), warn = console.warn, includeDrafts = false } = {},
+) {
+  const vault = scanVault(contentDir, { warn, includeDrafts });
   const emitAsset = createAssetEmitter(publicDir);
 
   const resolveCover = (note, value) => {
@@ -117,7 +120,7 @@ export async function buildPosts(contentDir, { publicDir = path.resolve('public'
       gitFirstCommitDate(vault.root, note.relPath);
     if (!date) {
       date = fs.statSync(note.absPath).mtime;
-      if (fm.type !== 'page') warn(`[vault] ${note.relPath}: no date property and no git history; using the file's modified time. Add \`date: YYYY-MM-DD\`.`);
+      if (fm.type !== 'page' && !note.draft) warn(`[vault] ${note.relPath}: no date property and no git history; using the file's modified time. Add \`date: YYYY-MM-DD\`.`);
     }
 
     const type = fm.type === 'page' ? 'page' : fm.type === 'project' ? 'project' : 'post';
@@ -137,6 +140,7 @@ export async function buildPosts(contentDir, { publicDir = path.resolve('public'
       headings: rendered.headings,
       html: rendered.html,
       source: note.relPath,
+      ...(note.draft ? { draft: true } : {}),
       ...(type === 'project' ? projectFields(note, vault, warn) : {}),
     });
   }

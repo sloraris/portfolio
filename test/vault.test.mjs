@@ -8,6 +8,7 @@ import { buildPosts } from '../src/lib/vault/posts.mjs';
 import { scanVault } from '../src/lib/vault/scan.mjs';
 import { stripComments } from '../src/lib/vault/comments.mjs';
 import { parseYoutube } from '../src/lib/vault/plugins.mjs';
+import { vaultLoader, draftsWanted } from '../src/lib/vault/loader.mjs';
 
 // GitHub Actions sets CI=true, which makes the loader redact note names from its warnings (the logs are
 // public). Most tests assert on the full warning text, so run them as on a laptop; the tests that cover
@@ -435,4 +436,103 @@ test('an unpublished project is not built', async () => {
   write(root, 'Thing.md', '---\ntype: project\n---\nwip');
   const { posts } = await build(root);
   assert.equal(posts.length, 0);
+});
+
+
+// ------------------------------------------------------------------ draft preview (pnpm dev:drafts)
+
+test('draft preview renders unpublished notes, flagged as drafts, and leaves real posts alone', async () => {
+  const { posts } = await build(FIXTURES, { includeDrafts: true });
+  const bySlug = Object.fromEntries(posts.map((p) => [p.slug, p]));
+  assert.equal(bySlug['not-published-yet'].draft, true);
+  assert.equal(bySlug['secret-draft'].draft, true);
+  assert.equal(bySlug['defense-in-depth'].draft, undefined);
+  assert.equal(bySlug['example-featured-project'].draft, undefined);
+});
+
+test('without includeDrafts nothing is a draft (the default and every real build)', async () => {
+  const { posts } = await build(FIXTURES);
+  assert.ok(posts.every((p) => p.draft === undefined));
+  assert.ok(!posts.some((p) => p.slug === 'not-published-yet'));
+});
+
+test('drafts keep their type: an unpublished project and page land in their own sections', async () => {
+  const root = tmp();
+  write(root, 'Proj.md', '---\ntype: project\nstack: [Go]\n---\n# Proj\nwip');
+  write(root, 'Pg.md', '---\ntype: page\nslug: hello\n---\n# Pg\nwip');
+  write(root, 'Post.md', '---\npublish: false\n---\n# Post\nwip');
+  const { posts, warnings } = await build(root, { includeDrafts: true });
+  assert.deepEqual(
+    posts.map((p) => [p.slug, p.type, p.draft]).sort(),
+    [['hello', 'page', true], ['post', 'post', true], ['proj', 'project', true]],
+  );
+  assert.deepEqual(warnings, [], 'an undated draft does not nag about its date');
+});
+
+test('wikilinks between drafts, and from a draft to a published note, resolve', async () => {
+  const root = tmp();
+  write(root, 'A.md', '---\npublish: true\n---\nSee [[B]] and [[C]].');
+  write(root, 'B.md', '---\ntype: project\n---\nback to [[A]]');
+  write(root, 'C.md', '---\npublish: false\n---\nhi');
+  const live = await build(root);
+  assert.ok(!live.posts[0].html.includes('href'), 'on the live build links to unpublished notes stay plain text');
+  const { posts } = await build(root, { includeDrafts: true });
+  const html = Object.fromEntries(posts.map((p) => [p.slug, p.html]));
+  assert.ok(html.a.includes('href="/projects/b/"'));
+  assert.ok(html.a.includes('href="/posts/c/"'));
+  assert.ok(html.b.includes('href="/posts/a/"'));
+});
+
+test('a draft can never take the URL of a published note, or a reserved page slug; both only warn', async () => {
+  const root = tmp();
+  write(root, 'Live/Thing.md', '---\npublish: true\n---\nlive');
+  write(root, 'Old/Thing.md', '---\npublish: false\n---\nSTALE-COPY');
+  write(root, 'Projects.md', '---\ntype: page\n---\nreserved');
+  const { posts, warnings } = await build(root, { includeDrafts: true });
+  assert.deepEqual(posts.map((p) => [p.slug, p.draft]), [['thing', undefined]]);
+  assert.ok(!JSON.stringify(posts).includes('STALE-COPY'));
+  assert.equal(warnings.filter((w) => w.includes('draft preview')).length, 2);
+  // two real published notes still fail loudly
+  write(root, 'Other/Thing.md', '---\npublish: true\n---\nclash');
+  assert.throws(() => scanVault(root, { includeDrafts: true }), /duplicate slug "thing"/);
+});
+
+test('drafts only ever load under the dev server: no SHOW_DRAFTS, no watcher, or CI all mean off', () => {
+  const watcher = { add() {}, on() {} };
+  assert.equal(draftsWanted({ watcher, env: { SHOW_DRAFTS: '1' } }), true);
+  assert.equal(draftsWanted({ watcher, env: { SHOW_DRAFTS: 'true' } }), true);
+  assert.equal(draftsWanted({ watcher, env: {} }), false);
+  assert.equal(draftsWanted({ watcher, env: { SHOW_DRAFTS: '0' } }), false);
+  assert.equal(draftsWanted({ env: { SHOW_DRAFTS: '1' } }), false, 'astro build passes no watcher');
+  assert.equal(draftsWanted({ watcher, env: { SHOW_DRAFTS: '1', CI: 'true' } }), false);
+});
+
+test('the real loader keeps drafts out of the store when SHOW_DRAFTS is set but there is no watcher (a build)', async () => {
+  const root = tmp();
+  write(root, 'Live.md', '---\npublish: true\n---\n# Live\nok');
+  write(root, 'Draft.md', '---\npublish: false\n---\n# Draft\nSECRET-DRAFT');
+  const run = async (watcher) => {
+    const stored = [];
+    const logs = [];
+    await vaultLoader({ dir: root, publicDir: tmp() }).load({
+      store: { clear() { stored.length = 0; }, set: (e) => stored.push(e) },
+      parseData: async ({ data }) => data,
+      generateDigest: () => 'x',
+      logger: { info: (m) => logs.push(m), warn: (m) => logs.push(m), error: (m) => logs.push(m) },
+      watcher,
+    });
+    return { slugs: stored.map((e) => e.id).sort(), logs };
+  };
+  const prev = { SHOW_DRAFTS: process.env.SHOW_DRAFTS, CI: process.env.CI };
+  try {
+    process.env.SHOW_DRAFTS = '1';
+    delete process.env.CI;
+    const build = await run(undefined);
+    assert.deepEqual(build.slugs, ['live']);
+    assert.ok(build.logs.some((l) => l.includes('SHOW_DRAFTS is ignored')));
+    const dev = await run({ add() {}, on() {} });
+    assert.deepEqual(dev.slugs, ['draft', 'live']);
+  } finally {
+    for (const [k, v] of Object.entries(prev)) v === undefined ? delete process.env[k] : (process.env[k] = v);
+  }
 });

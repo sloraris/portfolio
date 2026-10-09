@@ -66,11 +66,19 @@ function* walk(dir) {
  * @property {string} name      filename without extension
  * @property {Record<string, any>} data  frontmatter
  * @property {string} body      markdown without frontmatter
- * @property {boolean} published
+ * @property {boolean} published  rendered by the site: `publish: true`, or (draft preview only) any note
+ * @property {boolean} draft      rendered only because of `includeDrafts`; never true in a real build
  * @property {string} slug
  */
 
-export function scanVault(rootInput, { warn = console.warn } = {}) {
+/**
+ * @param {string} rootInput
+ * @param {object}  [opts]
+ * @param {boolean} [opts.includeDrafts]  Treat every note as publishable, so unpublished ones can be previewed.
+ *   Only the dev server ever sets this (see loader.mjs). Real notes with `publish: true` keep their strict
+ *   checks; a draft that would collide with another note, or claim a reserved slug, is skipped with a warning.
+ */
+export function scanVault(rootInput, { warn = console.warn, includeDrafts = false } = {}) {
   const root = path.resolve(rootInput);
   if (!fs.existsSync(root) || !fs.statSync(root).isDirectory()) {
     throw new Error(`[vault] content directory not found: ${root}`);
@@ -102,7 +110,7 @@ export function scanVault(rootInput, { warn = console.warn } = {}) {
       }
       const published = isPublished(data);
       const slug = slugify(data.slug ?? name) || slugify(relPath);
-      notes.push({ absPath, relPath, dir: path.dirname(absPath), name, data, body, published, slug });
+      notes.push({ absPath, relPath, dir: path.dirname(absPath), name, data, body, published, draft: false, slug });
     } else {
       const key = path.basename(absPath).toLowerCase();
       if (!attachments.has(key)) attachments.set(key, []);
@@ -110,11 +118,9 @@ export function scanVault(rootInput, { warn = console.warn } = {}) {
     }
   }
 
-  const publishedNotes = notes.filter((n) => n.published);
-
   // Two published notes must never fight over one URL.
   const seen = new Map();
-  for (const n of publishedNotes) {
+  for (const n of notes.filter((n) => n.published)) {
     if (n.data.type === 'page' && RESERVED_PAGE_SLUGS.has(n.slug)) {
       throw new Error(
         `[vault] ${n.relPath}: "${n.slug}" is reserved by the site and can't be used as a page slug. ` +
@@ -129,6 +135,26 @@ export function scanVault(rootInput, { warn = console.warn } = {}) {
     }
     seen.set(n.slug, n);
   }
+
+  // Draft preview: unpublished notes join the published ones (after them, so they can never take a real
+  // note's URL). Setting `published` is what makes wikilinks between drafts resolve like on the live site.
+  if (includeDrafts) {
+    for (const n of notes) {
+      if (n.published) continue;
+      if (n.data.type === 'page' && RESERVED_PAGE_SLUGS.has(n.slug)) {
+        warn(`[vault] draft preview: ${n.relPath} skipped, "${n.slug}" is reserved by the site`);
+        continue;
+      }
+      if (seen.has(n.slug)) {
+        warn(`[vault] draft preview: ${n.relPath} skipped, its slug "${n.slug}" is already used by ${seen.get(n.slug).relPath}`);
+        continue;
+      }
+      seen.set(n.slug, n);
+      n.published = true;
+      n.draft = true;
+    }
+  }
+  const publishedNotes = notes.filter((n) => n.published);
 
   /** @type {Map<string, Note[]>} */
   const byName = new Map();
